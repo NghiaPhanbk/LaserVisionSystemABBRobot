@@ -104,8 +104,8 @@ def line_intersection(line1, line2):
     return int(x), int(y)
 
 def calc_weldpoint2robot(point):
-    # Zc = -d / (a / fx * (point[0] - cx) + b / fy * (point[1] - cy) + c)
-    Zc=800
+    Zc = -d / (a / fx * (point[0] - cx) + b / fy * (point[1] - cy) + c)
+    # Zc=800
     weldpoint2camera = np.array([[Zc / fx * (point[0] - cx)], [Zc / fy * (point[1] - cy)], [Zc], [1]])
     print("weldpoint2camera:", weldpoint2camera)
     weldpoint2robot = eye2hand.dot(weldpoint2camera).flatten()[0:3]
@@ -196,7 +196,7 @@ class find_trajectory(QObject):
             return 0
         # camera = pylon.InstantCamera(pylon.TlFactory.GetInstance().CreateFirstDevice())
     def main_func(self):
-        path = "E:/New_Code/App_Data/Test_eye_to_hand/test5.jpg"
+        path = "E:/Thesis/App_Data/Test_eye_to_hand/test5.jpg"
         a = self.camera_task(path)
         """ Test finding scantrajectory"""
         if a == 1:
@@ -287,7 +287,7 @@ class find_trajectory(QObject):
             self.data_signal.emit(scan_pos1)
             self.data_signal.emit("Stop point")
             self.data_signal.emit(scan_pos2)
-            result_path = "E:/New_Code/App_Data/Test_eye_to_hand/result.jpg"
+            result_path = "E:/Thesis/App_Data/Test_eye_to_hand/result.jpg"
             cv.imwrite(result_path, result)
             return 1
         else:

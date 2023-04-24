@@ -3,9 +3,9 @@ from ultralytics import  YOLO
 from ultralytics.yolo.v8.segment.predict import SegmentationPredictor
 import cv2 as cv
 
-original_image = cv.imread(r"E:\New_Code\App_Data\Test_eye_to_hand\test4.jpg")  # Replace with actual path to your image
+original_image = cv.imread(r"E:\Thesis\App_Data\Test_eye_to_hand\test4.jpg")  # Replace with actual path to your image
 resize_img = cv.resize(original_image, (640,640), interpolation = cv.INTER_AREA)
-model = YOLO("E:/New_Code/App_Data/best.pt")
+model = YOLO("E:/Thesis/App_Data/best.pt")
 results = model.predict(show=True, source = resize_img)
 cv.waitKey(0)
 import torchvision.transforms as T
