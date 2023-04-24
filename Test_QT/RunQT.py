@@ -10,6 +10,7 @@ import Finding_trajectory
 import Main_Scanning
 import WeldingTraject_filter
 import Main_Weld_Aft_Scan
+import Calib_process
 from Calibrate_function import Calib_camera
 from Calibrate_function import Calib_handeye
 from Calibrate_function import Calib_laser
@@ -19,6 +20,14 @@ from Calibrate_function import Calib_laser_eye_to_hand
 import numpy as np
 import cv2 as cv
 import time, sys
+
+# Globel variable
+check_path = checkerboard_calib_cam_path
+laser_path = checkerboard_calib_laser_path
+robot_path = calib_trajectory  # Open when calibrating
+R_path = R_path
+t_path = t_path
+caption_picture_ex = 0
 class MainWindow:
     def __init__(self):
         self.main_win = QMainWindow()
@@ -30,6 +39,15 @@ class MainWindow:
         # Define button screen 1
         self.uic.Continue.clicked.connect(self.show_screen2)
         self.uic.Close.clicked.connect(self.main_win.close)
+
+            # function button
+        self.uic.Star_calib_process_ex.clicked.connect(self.start_calib)
+        self.uic.Move_ex.clicked.connect(self.move_robot_ex)
+        self.uic.Get_pos_ex.clicked.connect(self.get_pos_ex)
+        self.uic.Save_pos_ex.clicked.connect(self.save_pos_ex)
+        self.uic.Checkerboard_ex.clicked.connect(self.capture_image_ex)
+        self.uic.Checker_laser_ex.clicked.connect(self.capture_checker_ex)
+        self.uic.Cap_laser_ex.clicked.connect(self.capture_laser_ex)
         # Define button screen 2
         self.uic.Continue_2.clicked.connect(self.show_screen3)
         self.uic.Back_2.clicked.connect(self.show_screen1)
@@ -67,6 +85,7 @@ class MainWindow:
         self.uic.tabWidget.setCurrentWidget(self.uic.eye_to_hand)
     def show_screen2(self,Screen_ind):
         self.uic.tabWidget.setCurrentWidget(self.uic.Eye_in_hand)
+        # self.quit()
     def show_screen3(self,Screen_ind):
         self.uic.tabWidget.setCurrentWidget(self.uic.Calib_main)
     def show_screen4(self,Screen_ind):
@@ -100,6 +119,71 @@ class MainWindow:
                 # plt.show()
         self.uic.welding_trajectory.addWidget(show_weld_chart(self.X,self.Y,self.Z))
 
+    # function for page 1 #
+    def start_calib(self):
+        choice = 1
+        VisionSystem = Calib_process.BaslerCam(choice)
+        VisionSystem.start()
+        Robot = Calib_process.RobotTask(choice)
+        Robot.start()
+        check_count = 0
+        check_laser_count = 0
+        laser_count = 0
+        caption_picture_ex = 0
+        while True:
+            img = VisionSystem.image
+            self.frame = cv.resize(img, (451, 331))
+            height, width, channel = self.frame.shape
+            bytesPerLine = 3 * width
+            self.frame = QtGui.QImage(self.frame.data, width, height, bytesPerLine, QtGui.QImage.Format_RGB888).rgbSwapped()
+            self.uic.show_image_calib_ex.setPixmap(QtGui.QPixmap.fromImage(self.frame))
+            # cv.imshow('Frame', frame)
+            # choice = cv.waitKey(70)
+            if caption_picture_ex == 1:
+                check_count += 1
+                # To start number with 0, e.g, 01 02 03 ... 09 10 11 12 ... 99
+                if check_count < 10:
+                    filename = check_path + "\checkerboard_0" + str(check_count) + '.jpg'
+                else:
+                    filename = check_path + "\checkerboard_" + str(check_count) + '.jpg'
+                cv.imwrite(filename, img)
+                print('Captured checkerboard image\nPair %d ' % (check_count))
+            elif caption_picture_ex == 2:
+                check_laser_count += 1
+                # To start number with 0, e.g, 01 02 03 ... 09 10 11 12 ... 99
+                if check_laser_count < 10:
+                    filename = laser_path + "\checker_0" + str(check_laser_count) + '.jpg'
+                else:
+                    filename = laser_path + "\checker_" + str(check_laser_count) + '.jpg'
+                cv.imwrite(filename, img)
+                print('Captured checker laser image\nPair %d ' % (check_laser_count))
+            elif caption_picture_ex == 3:
+                laser_count += 1
+                # To start number with 0, e.g, 01 02 03 ... 09 10 11 12 ... 99
+                if laser_count < 10:
+                    filename = laser_path + "\laser_0" + str(laser_count) + '.jpg'
+                else:
+                    filename = laser_path + "\laser_" + str(laser_count) + '.jpg'
+                cv.imwrite(filename, img)
+                print('Captured laser line image\nPair %d ' % (laser_count))
+            elif caption_picture_ex == 4:
+                VisionSystem.stop()
+                Robot.stop()
+                break
+    def move_robot_ex(self):
+        Calib_process.i = "r"
+    def get_pos_ex(self):
+        Calib_process.i = "t"
+    def save_pos_ex(self):
+        Calib_process.i = "s"
+    def capture_image_ex(self):
+        caption_picture_ex = 1
+    def capture_checker_ex(self):
+        caption_picture_ex = 2
+    def capture_laser_ex(self):
+        caption_picture_ex = 3
+    def quit_ex(self):
+        caption_picture_ex = 4
     # function for page 3  ##
     def calib_eye_to_hand(self):
         Calib_external_camera.ex_monoCalibrate()

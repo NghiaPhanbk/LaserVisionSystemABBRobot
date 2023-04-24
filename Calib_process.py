@@ -25,7 +25,7 @@ DX100Address = "192.168.255.1"
 DX100tcpPort = 80
 CR = "\r"
 CRLF = "\r\n"
-
+i = ""
 # global variables
 check_path = checkerboard_calib_cam_path
 laser_path = checkerboard_calib_laser_path
@@ -52,6 +52,11 @@ class BaslerCam():
                 break
         if self.device is not None:
             self.camera = pylon.InstantCamera(pylon.TlFactory.GetInstance().CreateDevice(self.device))
+            self.camera.Open()
+            self.camera.Width.SetValue(1700)
+            self.camera.Height.SetValue(1200)
+            self.camera.OffsetX.SetValue(8)
+            self.camera.OffsetY.SetValue(8)
         else:
             print("Không tìm thấy thiết bị:", self.desired_model)
         # self._tlFactory = pylon.TlFactory.GetInstance()
@@ -61,11 +66,6 @@ class BaslerCam():
         # self.LaserOn = False
 
     def grabImg(self):
-        self.camera.Open()
-        self.camera.Width.SetValue(1700)
-        self.camera.Height.SetValue(1200)
-        self.camera.OffsetX.SetValue(8)
-        self.camera.OffsetY.SetValue(8)
         if self.LaserOn == True:
             self.camera.ExposureTimeAbs = 5000
         else:
@@ -254,7 +254,7 @@ class RobotTask():
         print(
             'press "c" to capture checkerboard, "v" to capture checkerboard for laser calib, "b" to  capture laser  "q" to quit')
         while not self.stopped:
-            i = input()  # keyboard input
+            # i = input()  # keyboard input
             if i == "r":
                 if pos_no <= waypoint:
                     a = self.read_pos_from_txt(pos_no)

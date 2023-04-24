@@ -36,7 +36,7 @@
      </size>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="eye_to_hand">
      <attribute name="title">
@@ -53,22 +53,6 @@
       </property>
       <property name="text">
        <string>Move</string>
-      </property>
-     </widget>
-     <widget class="QFrame" name="Image_eye_to_hand">
-      <property name="geometry">
-       <rect>
-        <x>580</x>
-        <y>20</y>
-        <width>381</width>
-        <height>321</height>
-       </rect>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
       </property>
      </widget>
      <widget class="QPushButton" name="Checkerboard_ex">
@@ -225,7 +209,7 @@
        <string>CAMERA TASK</string>
       </property>
      </widget>
-     <widget class="QListWidget" name="listWidget_2">
+     <widget class="QListWidget" name="infor_process_ex">
       <property name="geometry">
        <rect>
         <x>30</x>
@@ -233,6 +217,32 @@
         <width>931</width>
         <height>311</height>
        </rect>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="Star_calib_process_ex">
+      <property name="geometry">
+       <rect>
+        <x>60</x>
+        <y>300</y>
+        <width>121</width>
+        <height>51</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Start</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="show_image_calib_ex">
+      <property name="geometry">
+       <rect>
+        <x>510</x>
+        <y>20</y>
+        <width>451</width>
+        <height>331</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
       </property>
      </widget>
     </widget>
@@ -264,22 +274,6 @@
       </property>
       <property name="text">
        <string>Get pos</string>
-      </property>
-     </widget>
-     <widget class="QFrame" name="Image_eye_in_hand">
-      <property name="geometry">
-       <rect>
-        <x>580</x>
-        <y>20</y>
-        <width>381</width>
-        <height>321</height>
-       </rect>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
       </property>
      </widget>
      <widget class="QPushButton" name="Checkerboard_in">
@@ -423,7 +417,7 @@
        <string>ROBOT TASK</string>
       </property>
      </widget>
-     <widget class="QListWidget" name="listWidget_3">
+     <widget class="QListWidget" name="infor_process_in">
       <property name="geometry">
        <rect>
         <x>30</x>
@@ -431,6 +425,32 @@
         <width>931</width>
         <height>311</height>
        </rect>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="Star_calib_process_in">
+      <property name="geometry">
+       <rect>
+        <x>60</x>
+        <y>300</y>
+        <width>121</width>
+        <height>51</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Start</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="show_image_calib_in">
+      <property name="geometry">
+       <rect>
+        <x>510</x>
+        <y>20</y>
+        <width>451</width>
+        <height>331</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
       </property>
      </widget>
     </widget>
