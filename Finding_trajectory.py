@@ -200,7 +200,7 @@ class find_trajectory(QObject):
         a = self.camera_task(path)
         """ Test finding scantrajectory"""
         if a == 1:
-            model = YOLO("E:/New_Code/App_Data/best.pt")
+            model = YOLO("E:/Thesis/App_Data/best.pt")
             input_img = cv.imread(path)  # Replace with actual path to your image
             resize_img = cv.resize(input_img, (640, 640), interpolation=cv.INTER_AREA)
             results = model.predict(show=False, source=resize_img)
