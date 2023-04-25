@@ -15,6 +15,7 @@ from pypylon import pylon
 from GlobalVariables import *
 from math import pi, sin, cos
 import threading
+from App_Lib.Yaskawa_Lib import Yaskawa
 
 os.environ["PYLON_CAMEMU"] = "3"
 import time
@@ -25,7 +26,6 @@ DX100Address = "192.168.255.1"
 DX100tcpPort = 80
 CR = "\r"
 CRLF = "\r\n"
-i = ""
 # global variables
 check_path = checkerboard_calib_cam_path
 laser_path = checkerboard_calib_laser_path
@@ -51,6 +51,7 @@ class BaslerCam():
                 self.device = dev_info
                 break
         if self.device is not None:
+            self.flag_cam_in = 1
             self.camera = pylon.InstantCamera(pylon.TlFactory.GetInstance().CreateDevice(self.device))
             self.camera.Open()
             self.camera.Width.SetValue(1700)
@@ -59,6 +60,7 @@ class BaslerCam():
             self.camera.OffsetY.SetValue(8)
         else:
             print("Không tìm thấy thiết bị:", self.desired_model)
+            self.flag_cam = 0
         # self._tlFactory = pylon.TlFactory.GetInstance()
         # self._devices = self._tlFactory.EnumerateDevices()
         # self.camera = pylon.InstantCamera(pylon.TlFactory.GetInstance().CreateFirstDevice())
@@ -104,9 +106,11 @@ class RobotTask():
         self.m = 0.
         self.stopped = False
         self.CurrentPos = []
-        # self.model_count = 0
+        self.robot = Yaskawa()
         self.robot_path = robot_path
-
+        self.flag_robot = self.robot.StartRequest()
+        if self.flag_robot == 0:
+            print("no robot")
     def utf8len(self, inputString):
         return len(inputString.encode('utf-8'))
 
@@ -117,6 +121,7 @@ class RobotTask():
             return self.utf8len(command + CR)
 
     def read_pos_from_txt(self, pos):
+        # command = []
         trajectory = open(self.robot_path, "r")
         for i, line in enumerate(trajectory):
             if i == pos - 1:
@@ -242,54 +247,57 @@ class RobotTask():
     def process(self):
         # R_path
         # t_path
-        R_end2base = []
-        T_end2base = []
-        H_end2base_model = []
+        # R_end2base = []
+        # T_end2base = []
+        # H_end2base_model = []
         # pattern_count = 0
-        pos_no = 1
+        # pos_no = 1
         trajectory = open(self.robot_path, "r")
         waypoint = len(trajectory.readlines())
         print(f"There are {waypoint} waypoints in robot trajectory.")
         print('press "r" to move to the next waypoint, "t" to record the current waypoint, "s" to save.')
-        print(
-            'press "c" to capture checkerboard, "v" to capture checkerboard for laser calib, "b" to  capture laser  "q" to quit')
-        while not self.stopped:
-            # i = input()  # keyboard input
-            if i == "r":
-                if pos_no <= waypoint:
-                    a = self.read_pos_from_txt(pos_no)
-                    print(f"ROBOT TO WAYPOINT {pos_no}...")
-                    self.robot_move_to_pos(a)
-                    print(a)
-                    time.sleep(2)
-                    pos_no += 1
-                    if pos_no == waypoint + 1:
-                        print("----------ROBOT TRAJECTORY IS FINISHED----------\nInput 'r' to return...")
-                else:
-                    pos_no = 1
-                    a = self.read_pos_from_txt(pos_no)
-                    print("\nReturning to first waypoint...")
-                    print(f"ROBOT TO WAYPOINT {pos_no}...")
-                    self.robot_move_to_pos(a)
-                    print(a)
-                    time.sleep(2)
-                    pos_no += 1
-            elif i == 't':
-                self.read_pos_from_robot()
-                R, t = self.read()
-                print(f'\nTRANSFORMATION AT WAYPOINT {pos_no - 1}:')
-                print('Rotation R:\n', R)
-                print('Translation T:\n', t)
-                R_end2base.append(R)
-                T_end2base.append(t)
-                time.sleep(0.5)
-            elif i == 's':
-                RR = np.array(R_end2base)
-                TT = np.array(T_end2base)
-                self.save(R_path, RR)
-                self.save(t_path, TT)
-                print('ALL WAYPOINT TRANSFORMATIONS SAVED!')
-                time.sleep(3)
+        print('press "c" to capture checkerboard, "v" to capture checkerboard for laser calib, "b" to  capture laser  "q" to quit')
+        # while not self.stopped:
+        #     # i = input()  # keyboard input
+        #     if self.i == "r":
+        #         if pos_no <= waypoint:
+        #             a = self.read_pos_from_txt(pos_no)
+        #             print(f"ROBOT TO WAYPOINT {pos_no}...")
+        #             self.robot_move_to_pos(a)
+        #             print(a)
+        #             time.sleep(2)
+        #             pos_no += 1
+        #             if pos_no == waypoint + 1:
+        #                 print("----------ROBOT TRAJECTORY IS FINISHED----------\nInput 'r' to return...")
+        #             # self.i = ""
+        #         else:
+        #             pos_no = 1
+        #             a = self.read_pos_from_txt(pos_no)
+        #             print("\nReturning to first waypoint...")
+        #             print(f"ROBOT TO WAYPOINT {pos_no}...")
+        #             self.robot_move_to_pos(a)
+        #             print(a)
+        #             time.sleep(2)
+        #             pos_no += 1
+        #             # self.i = ""
+        #     elif self.i == 't':
+        #         self.read_pos_from_robot()
+        #         R, t = self.read()
+        #         print(f'\nTRANSFORMATION AT WAYPOINT {pos_no - 1}:')
+        #         print('Rotation R:\n', R)
+        #         print('Translation T:\n', t)
+        #         R_end2base.append(R)
+        #         T_end2base.append(t)
+        #         # self.i = ""
+        #         time.sleep(0.5)
+        #     elif self.i == 's':
+        #         RR = np.array(R_end2base)
+        #         TT = np.array(T_end2base)
+        #         self.save(R_path, RR)
+        #         self.save(t_path, TT)
+        #         print('ALL WAYPOINT TRANSFORMATIONS SAVED!')
+        #         # self.i = ""
+        #         time.sleep(3)
 
     def stop(self):
         self.stopped = True
@@ -301,50 +309,50 @@ class RobotTask():
 if __name__ == "__main__":
     choice = 1
     VisionSystem = BaslerCam(choice)
-    VisionSystem.start()
     Robot = RobotTask(choice)
-    Robot.start()
+    if (VisionSystem.flag_cam == 1 & Robot.flag_robot == 1):
+        VisionSystem.start()
+        Robot.start()
+        # Window size reduction ratio
+        t = 2
+        check_count = 0
+        check_laser_count = 0
+        laser_count = 0
+        n = 0
 
-    # Window size reduction ratio
-    t = 2
-    check_count = 0
-    check_laser_count = 0
-    laser_count = 0
-    n = 0
-
-    while True:
-        img = VisionSystem.image
-        frame = cv.resize(img, (720, 480))
-        cv.imshow('Frame', frame)
-        choice = cv.waitKey(70)
-        if choice & 0xFF == ord("c"):
-            check_count += 1
-            # To start number with 0, e.g, 01 02 03 ... 09 10 11 12 ... 99
-            if check_count < 10:
-                filename = check_path + "\checkerboard_0" + str(check_count) + '.jpg'
-            else:
-                filename = check_path + "\checkerboard_" + str(check_count) + '.jpg'
-            cv.imwrite(filename, img)
-            print('Captured checkerboard image\nPair %d ' % (check_count))
-        elif choice & 0xFF == ord("v"):
-            check_laser_count += 1
-            # To start number with 0, e.g, 01 02 03 ... 09 10 11 12 ... 99
-            if check_laser_count < 10:
-                filename = laser_path + "\checker_0" + str(check_laser_count) + '.jpg'
-            else:
-                filename = laser_path + "\checker_" + str(check_laser_count) + '.jpg'
-            cv.imwrite(filename, img)
-            print('Captured checker laser image\nPair %d ' % (check_laser_count))
-        elif choice & 0xFF == ord("b"):
-            laser_count += 1
-            # To start number with 0, e.g, 01 02 03 ... 09 10 11 12 ... 99
-            if laser_count < 10:
-                filename = laser_path + "\laser_0" + str(laser_count) + '.jpg'
-            else:
-                filename = laser_path + "\laser_" + str(laser_count) + '.jpg'
-            cv.imwrite(filename, img)
-            print('Captured laser line image\nPair %d ' % (laser_count))
-        elif choice & 0xFF == ord("q"):
-            VisionSystem.stop()
-            Robot.stop()
-            break
+        while True:
+            img = VisionSystem.image
+            frame = cv.resize(img, (720, 480))
+            cv.imshow('Frame', frame)
+            choice = cv.waitKey(70)
+            if choice & 0xFF == ord("c"):
+                check_count += 1
+                # To start number with 0, e.g, 01 02 03 ... 09 10 11 12 ... 99
+                if check_count < 10:
+                    filename = check_path + "\checkerboard_0" + str(check_count) + '.jpg'
+                else:
+                    filename = check_path + "\checkerboard_" + str(check_count) + '.jpg'
+                cv.imwrite(filename, img)
+                print('Captured checkerboard image\nPair %d ' % (check_count))
+            elif choice & 0xFF == ord("v"):
+                check_laser_count += 1
+                # To start number with 0, e.g, 01 02 03 ... 09 10 11 12 ... 99
+                if check_laser_count < 10:
+                    filename = laser_path + "\checker_0" + str(check_laser_count) + '.jpg'
+                else:
+                    filename = laser_path + "\checker_" + str(check_laser_count) + '.jpg'
+                cv.imwrite(filename, img)
+                print('Captured checker laser image\nPair %d ' % (check_laser_count))
+            elif choice & 0xFF == ord("b"):
+                laser_count += 1
+                # To start number with 0, e.g, 01 02 03 ... 09 10 11 12 ... 99
+                if laser_count < 10:
+                    filename = laser_path + "\laser_0" + str(laser_count) + '.jpg'
+                else:
+                    filename = laser_path + "\laser_" + str(laser_count) + '.jpg'
+                cv.imwrite(filename, img)
+                print('Captured laser line image\nPair %d ' % (laser_count))
+            elif choice & 0xFF == ord("q"):
+                VisionSystem.stop()
+                Robot.stop()
+                break

@@ -15,6 +15,7 @@ from pypylon import pylon
 from GlobalVariables import *
 from math import pi, sin, cos
 import threading
+from App_Lib.Yaskawa_Lib import Yaskawa
 
 os.environ["PYLON_CAMEMU"] = "3"
 import time
@@ -51,9 +52,16 @@ class BaslerCam():
                 self.device = dev_info
                 break
         if self.device is not None:
+            self.flag_cam_ex = 1
             self.camera = pylon.InstantCamera(pylon.TlFactory.GetInstance().CreateDevice(self.device))
+            self.camera.Open()
+            self.camera.Width.SetValue(2560)
+            self.camera.Height.SetValue(2560)
+            self.camera.OffsetX.SetValue(520)
+            self.camera.OffsetY.SetValue(188)
         else:
             print("Không tìm thấy thiết bị:", self.desired_model)
+            self.flag_cam_ex = 0
         # self._tlFactory = pylon.TlFactory.GetInstance()
         # self._devices = self._tlFactory.EnumerateDevices()
         # self.camera = pylon.InstantCamera(pylon.TlFactory.GetInstance().CreateFirstDevice())
@@ -61,11 +69,6 @@ class BaslerCam():
         # self.LaserOn = False
 
     def grabImg(self):
-        self.camera.Open()
-        self.camera.Width.SetValue(2560)
-        self.camera.Height.SetValue(2560)
-        self.camera.OffsetX.SetValue(520)
-        self.camera.OffsetY.SetValue(188)
         if self.LaserOn == True:
             self.camera.ExposureTimeAbs = 5000
         else:
@@ -104,8 +107,12 @@ class RobotTask():
         self.m = 0.
         self.stopped = False
         self.CurrentPos = []
+        self.robot = Yaskawa()
         # self.model_count = 0
         self.robot_path = robot_path
+        self.flag_robot_ex = self.robot.StartRequest()
+        if self.flag_robot_ex == 0:
+            print("no robot")
 
     def utf8len(self, inputString):
         return len(inputString.encode('utf-8'))
@@ -251,45 +258,44 @@ class RobotTask():
         waypoint = len(trajectory.readlines())
         print(f"There are {waypoint} waypoints in robot trajectory.")
         print('press "r" to move to the next waypoint, "t" to record the current waypoint, "s" to save.')
-        print(
-            'press "c" to capture checkerboard, "v" to capture checkerboard for laser calib, "b" to  capture laser  "q" to quit')
-        while not self.stopped:
-            i = input()  # keyboard input
-            if i == "r":
-                if pos_no <= waypoint:
-                    a = self.read_pos_from_txt(pos_no)
-                    print(f"ROBOT TO WAYPOINT {pos_no}...")
-                    self.robot_move_to_pos(a)
-                    print(a)
-                    time.sleep(2)
-                    pos_no += 1
-                    if pos_no == waypoint + 1:
-                        print("----------ROBOT TRAJECTORY IS FINISHED----------\nInput 'r' to return...")
-                else:
-                    pos_no = 1
-                    a = self.read_pos_from_txt(pos_no)
-                    print("\nReturning to first waypoint...")
-                    print(f"ROBOT TO WAYPOINT {pos_no}...")
-                    self.robot_move_to_pos(a)
-                    print(a)
-                    time.sleep(2)
-                    pos_no += 1
-            elif i == 't':
-                self.read_pos_from_robot()
-                R, t = self.read()
-                print(f'\nTRANSFORMATION AT WAYPOINT {pos_no - 1}:')
-                print('Rotation R:\n', R)
-                print('Translation T:\n', t)
-                R_end2base.append(R)
-                T_end2base.append(t)
-                time.sleep(0.5)
-            elif i == 's':
-                RR = np.array(R_end2base)
-                TT = np.array(T_end2base)
-                self.save(R_path, RR)
-                self.save(t_path, TT)
-                print('ALL WAYPOINT TRANSFORMATIONS SAVED!')
-                time.sleep(3)
+        print('press "c" to capture checkerboard, "v" to capture checkerboard for laser calib, "b" to  capture laser  "q" to quit')
+        # while not self.stopped:
+        #     i = input()  # keyboard input
+        #     if i == "r":
+        #         if pos_no <= waypoint:
+        #             a = self.read_pos_from_txt(pos_no)
+        #             print(f"ROBOT TO WAYPOINT {pos_no}...")
+        #             self.robot_move_to_pos(a)
+        #             print(a)
+        #             time.sleep(2)
+        #             pos_no += 1
+        #             if pos_no == waypoint + 1:
+        #                 print("----------ROBOT TRAJECTORY IS FINISHED----------\nInput 'r' to return...")
+        #         else:
+        #             pos_no = 1
+        #             a = self.read_pos_from_txt(pos_no)
+        #             print("\nReturning to first waypoint...")
+        #             print(f"ROBOT TO WAYPOINT {pos_no}...")
+        #             self.robot_move_to_pos(a)
+        #             print(a)
+        #             time.sleep(2)
+        #             pos_no += 1
+        #     elif i == 't':
+        #         self.read_pos_from_robot()
+        #         R, t = self.read()
+        #         print(f'\nTRANSFORMATION AT WAYPOINT {pos_no - 1}:')
+        #         print('Rotation R:\n', R)
+        #         print('Translation T:\n', t)
+        #         R_end2base.append(R)
+        #         T_end2base.append(t)
+        #         time.sleep(0.5)
+        #     elif i == 's':
+        #         RR = np.array(R_end2base)
+        #         TT = np.array(T_end2base)
+        #         self.save(R_path, RR)
+        #         self.save(t_path, TT)
+        #         print('ALL WAYPOINT TRANSFORMATIONS SAVED!')
+        #         time.sleep(3)
 
     def stop(self):
         self.stopped = True
