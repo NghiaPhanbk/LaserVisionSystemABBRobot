@@ -173,7 +173,12 @@ class MainWindow:
         if (self.VisionSystem_ex.flag_cam_ex == 1 & self.Robot_ex.flag_robot_ex == 1):
             self.VisionSystem_ex.start()
             self.Robot_ex.start()
-            self.uic.infor_process_in.addItem("There are 16 waypoints in robot trajectory")
+            self.uic.infor_process_ex.addItem("There are 16 waypoints in robot trajectory")
+        if self.VisionSystem_ex.flag_cam_ex == 0:
+            self.uic.infor_process_ex.addItem("Connection error with acA3800-10gm")
+        if self.Robot_ex.flag_robot_ex == 0:
+            self.uic.infor_process_ex.addItem("Robot connection error")
+
     def move_robot_ex(self):
         trajectory = open(robot_path_ex, "r")
         waypoint = len(trajectory.readlines())
@@ -296,6 +301,10 @@ class MainWindow:
             self.VisionSystem_in.start()
             self.Robot_in.start()
             self.uic.infor_process_in.addItem("There are 16 waypoints in robot trajectory")
+        if self.VisionSystem_in.flag_cam_in == 0:
+            self.uic.infor_process_in.addItem("Connection error with acA1920-40gm")
+        if self.Robot_in.flag_robot == 0:
+            self.uic.infor_process_in.addItem("Robot connection error")
     def move_robot_in(self):
         trajectory = open(robot_path_in, "r")
         waypoint = len(trajectory.readlines())
