@@ -16,7 +16,8 @@ import time
 # termination criteria 
 criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 calibrate_criteria = (cv.TermCriteria_COUNT + cv.TermCriteria_EPS, 500, 0.0001)
-find_chessboard_flags = cv.CALIB_CB_ADAPTIVE_THRESH + cv.CALIB_CB_FILTER_QUADS + cv.CALIB_CB_NORMALIZE_IMAGE
+find_chessboard_flags = cv.CALIB_CB_ADAPTIVE_THRESH \
+                        + cv.CALIB_CB_FILTER_QUADS + cv.CALIB_CB_NORMALIZE_IMAGE
 
 def calibrate(dirpath, prefix, image_format, square_size, width, height):
     """ Apply camera calibration operation for images in the given directory path. """

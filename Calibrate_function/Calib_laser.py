@@ -11,8 +11,11 @@ from GlobalVariables import *
 
 vis = Vision()
 objp = vis.create_objpoint()
-criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
-find_chessboard_flags = cv.CALIB_CB_ADAPTIVE_THRESH + cv.CALIB_CB_FILTER_QUADS + cv.CALIB_CB_NORMALIZE_IMAGE
+criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 3000, 0.00001)
+find_chessboard_flags = cv.CALIB_CB_ADAPTIVE_THRESH
+
+# find_chessboard_flags = cv.CALIB_CB_ADAPTIVE_THRESH + cv.CALIB_CB_FILTER_QUADS + cv.CALIB_CB_NORMALIZE_IMAGE
+# criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 40, 0.001)
 intrinsic, dist_coffs = load_coefficients((camera_params))
 fx = intrinsic[0][0]
 fy = intrinsic[1][1]
@@ -94,19 +97,22 @@ def LaserPosition(width,height,chessPath,LaserPath):
     # temp2 = chess
     # Adaptive center extraction
     thinned = cv.ximgproc.thinning(laser_processed)
+    # thinned = laser_processed
+    # cv.imshow("thin",thinned)
+    # cv.waitKey(0)
     line = vis.LaserCenter(thinned)     
     inv = np.linalg.inv(rotation_matrix)
-    for i in range(400,rows-400,1):
+    for i in range(400,rows-200,1):
         for j in range(650,cols-650,1):
             if line[i][j] == 255:
                 cv.circle(laser_undis, (j,i), 5, [0,255,0], 2)
                 Zc = (tvec[0][0] * inv[2][0] +  tvec[1][0] * inv[2][1] + tvec[2][0] * inv[2][2])/(inv[2][0]/fx*(j-cx) + inv[2][1]/fy*(i-cy) + inv[2][2])
                 C = np.array([Zc/fx*(j-cx), Zc/fy*(i-cy), Zc]).T.reshape(3,1)
                 pointinlaserplane.append(C)
-    laser_undis[400,:] = 255
-    laser_undis[rows - 400,:] = 255
-    laser_undis[:,650] = 255
-    laser_undis[:,cols-650] = 255
+    # laser_undis[400,:] = 255
+    # laser_undis[rows - 200,:] = 255
+    # laser_undis[:,650] = 255
+    # laser_undis[:,cols-650] = 255
     laser_undis = cv.resize(laser_undis, (870,687), interpolation = cv.INTER_AREA)
     chess_undis = cv.resize(chess_undis, (870,687), interpolation = cv.INTER_AREA)
     # temp1 = cv.resize(temp1, (870,687), interpolation = cv.INTER_AREA)
@@ -114,7 +120,9 @@ def LaserPosition(width,height,chessPath,LaserPath):
     result1 = np.concatenate((chess_undis, laser_undis), axis=1)
     # result2 = np.concatenate((temp2, temp1), axis=1)
     # del temp1,emp2
-    # cv.imshow("draw chess, draw laser on chess",result1)
+    # cv.namedWindow('img', cv.WINDOW_NORMAL)
+    # cv.resizeWindow('img', 1280,640)
+    # cv.imshow("img",result1)
     # # cv.imshow("undistorted chess, laser preprocessing",result2)
     # cv.waitKey(0)
     # cv.destroyAllWindows()
@@ -129,12 +137,12 @@ def laserCalibrate():
     height=5
     tvec1, rotation_matrix1 = LaserPosition( width, height,laser_path + "checker_01.jpg", laser_path + "laser_01.jpg")
     tvec2, rotation_matrix2 = LaserPosition( width, height,laser_path + "checker_02.jpg", laser_path + "laser_02.jpg")
-    tvec3, rotation_matrix3 = LaserPosition( width, height,laser_path + "checker_03.jpg", laser_path + "laser_03.jpg")
+    # tvec3, rotation_matrix3 = LaserPosition( width, height,laser_path + "checker_03.jpg", laser_path + "laser_03.jpg")
     tvec4, rotation_matrix4 = LaserPosition( width, height,laser_path + "checker_04.jpg", laser_path + "laser_04.jpg")
     tvec5, rotation_matrix5 = LaserPosition( width, height,laser_path + "checker_05.jpg", laser_path + "laser_05.jpg")
     tvec6, rotation_matrix6 = LaserPosition( width, height,laser_path + "checker_06.jpg", laser_path + "laser_06.jpg")
     tvec7, rotation_matrix7 = LaserPosition(width, height, laser_path + "checker_07.jpg", laser_path + "laser_07.jpg")
-    tvec8, rotation_matrix8 = LaserPosition( width, height,laser_path + "checker_08.jpg", laser_path + "laser_08.jpg")
+    # tvec8, rotation_matrix8 = LaserPosition( width, height,laser_path + "checker_08.jpg", laser_path + "laser_08.jpg")
     tvec9, rotation_matrix9 = LaserPosition( width, height,laser_path + "checker_09.jpg", laser_path + "laser_09.jpg")
     tvec10, rotation_matrix10 = LaserPosition( width, height,laser_path + "checker_10.jpg", laser_path + "laser_10.jpg")
     tvec11, rotation_matrix11 = LaserPosition( width, height,laser_path + "checker_11.jpg", laser_path + "laser_11.jpg")
@@ -219,8 +227,8 @@ def laserCalibrate():
     coordinate(ax,tvec1,rotation_matrix1, 'O1')
     ChessPlane(ax,tvec2,rotation_matrix2, 'm')
     coordinate(ax,tvec2,rotation_matrix2, 'O2')
-    ChessPlane(ax,tvec3,rotation_matrix3, 'y')
-    coordinate(ax,tvec3,rotation_matrix3, 'O3')
+    # ChessPlane(ax,tvec3,rotation_matrix3, 'y')
+    # coordinate(ax,tvec3,rotation_matrix3, 'O3')
     ChessPlane(ax,tvec4,rotation_matrix4, 'g')
     coordinate(ax,tvec4,rotation_matrix4, 'O3')
     ChessPlane(ax,tvec5,rotation_matrix5, 'b')

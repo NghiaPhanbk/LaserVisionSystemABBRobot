@@ -150,7 +150,9 @@ def Preprocessing(img):
 def convert_to_scan_point(start_point,end_point):
     start_point[0]=start_point[0]-150
     end_point[0] = end_point[0] - 130
-    common_point = (start_point[2]+end_point[2])/2+80
+    start_point[1]=start_point[1]+40
+    end_point[1] = end_point[1]+40
+    common_point = (start_point[2]+end_point[2])/2+50
     start_point[2] = common_point
     end_point[2] = common_point
     return start_point,end_point
@@ -178,7 +180,7 @@ class find_trajectory(QObject):
             camera.Height.SetValue(2560)
             camera.OffsetX.SetValue(520)
             camera.OffsetY.SetValue(188)
-            camera.ExposureTimeAbs = 25000
+            camera.ExposureTimeAbs = 30000
             camera.StartGrabbing(pylon.GrabStrategy_LatestImages)
             global CurrImg
             if camera.IsGrabbing():
@@ -196,15 +198,18 @@ class find_trajectory(QObject):
             return 0
         # camera = pylon.InstantCamera(pylon.TlFactory.GetInstance().CreateFirstDevice())
     def main_func(self):
-        path = "E:/Thesis/App_Data/Test_eye_to_hand/test5.jpg"
-        a = self.camera_task(path)
+        path = "E:/Thesis/App_Data/Test_eye_to_hand/test6.jpg"
+        # a = self.camera_task(path)
+        a=1
         """ Test finding scantrajectory"""
         if a == 1:
             model = YOLO("E:/Thesis/App_Data/best.pt")
             input_img = cv.imread(path)  # Replace with actual path to your image
             resize_img = cv.resize(input_img, (640, 640), interpolation=cv.INTER_AREA)
-            results = model.predict(show=False, source=resize_img)
-            img = T.ToPILImage()(results[0][0].masks.masks)
+            results = model.predict(show=True, source=resize_img, conf = 0.6, iou = 0)
+            # img = T.ToPILImage()(results[0][1].masks.masks)
+            img = T.ToPILImage()(results[0].masks.masks)
+
             binary_image = np.array(img)
             binary_image = cv.resize(binary_image, (2560, 2560))
             contours, hierarchy = cv.findContours(binary_image, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
@@ -229,17 +234,17 @@ class find_trajectory(QObject):
 
             # 2 point of rectangle
             line = LaserCenter(thinned, box)
-            # cv.namedWindow('thin', cv.WINDOW_NORMAL)
-            # cv.resizeWindow('thin', 640, 640)
-            # cv.imshow("thin",line)
-            # cv.waitKey(0)
+            cv.namedWindow('thin', cv.WINDOW_NORMAL)
+            cv.resizeWindow('thin', 640, 640)
+            cv.imshow("thin",original_image1)
+            cv.waitKey(0)
             for i in range(line.shape[0]):
                 for j in range(line.shape[1]):
                     if line[i][j] == 255:
                         cv.circle(original_image, (j,i), 5, [0,255,0], 5)
             points = np.where(line == 255)
             data = np.vstack((points[1], points[0])).T
-            print(data[-1])
+            # print(data[-1])
             print("Line",line)
             sorted_box = sorted(box, key=lambda x: x[0])
             print(sorted_box)
@@ -287,7 +292,7 @@ class find_trajectory(QObject):
             self.data_signal.emit(scan_pos1)
             self.data_signal.emit("Stop point")
             self.data_signal.emit(scan_pos2)
-            result_path = "E:/Thesis/App_Data/Test_eye_to_hand/result.jpg"
+            result_path = "E:/Thesis/App_Data/Test_eye_to_hand/result1.jpg"
             cv.imwrite(result_path, result)
             return 1
         else:

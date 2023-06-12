@@ -37,6 +37,7 @@ t_path = t_path
 
 class BaslerCam():
     def __init__(self, key):
+        self.flag_cam_in = 0
         self.key = key
         self.image = 1
         self.desired_model = "acA1920-40gm"
@@ -69,7 +70,7 @@ class BaslerCam():
 
     def grabImg(self):
         if self.LaserOn == True:
-            self.camera.ExposureTimeAbs = 5000
+            self.camera.ExposureTimeAbs = 4000
         else:
             self.camera.ExposureTimeAbs = 10000
         self.camera.StartGrabbing()
@@ -93,7 +94,8 @@ class BaslerCam():
     def stop(self):
         self.started = False
         cv.destroyAllWindows()
-        self.camera.Close()
+        if self.flag_cam_in == 1:
+            self.camera.Close()
 
     def start(self):
         threading.Thread(target=self.grabImg, args=()).start()

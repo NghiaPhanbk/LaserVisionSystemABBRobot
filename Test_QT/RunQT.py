@@ -21,7 +21,8 @@ from Calibrate_function import Calib_laser_eye_to_hand
 import numpy as np
 import cv2 as cv
 import time, sys
-
+from skimage.measure import ransac, LineModelND
+import glob
 # Globel variable #
 # Eye in hand
 
@@ -46,7 +47,7 @@ class MainWindow:
         self.uic.setupUi(self.main_win)
         # self.uic.Button_Start.clicked.connect(self.show_screen)
         # self.uic.Button_Sop.clicked.connect(self.main_win.close)
-# global variable
+#### global variable
                                     # eye to hand
         self.pos_no_ex = 0
         self.R_end2base_ex = []
@@ -60,7 +61,7 @@ class MainWindow:
         choice = 1
         self.VisionSystem_ex = Eye_to_hand_calib_process.BaslerCam(choice)
         self.Robot_ex = Eye_to_hand_calib_process.RobotTask(choice)
-
+        self.flag_calib_ex = 0
                                     # eye in hand
         self.pos_no_in = 0
         self.R_end2base_in = []
@@ -74,6 +75,9 @@ class MainWindow:
         self.VisionSystem_in = Calib_process.BaslerCam(choice)
         self.Robot_in = Calib_process.RobotTask(choice)
         # self.filename = ""
+        self.flag_calib_in = 0
+                        # main scanning
+        self.flag_scan = 0
         # Define button screen 1
         self.uic.Continue.clicked.connect(self.show_screen2)
         self.uic.Close.clicked.connect(self.main_win.close)
@@ -136,6 +140,7 @@ class MainWindow:
         self.quit_ex()
     def show_screen3(self,Screen_ind):
         self.uic.tabWidget.setCurrentWidget(self.uic.Calib_main)
+        self.quit_in()
     def show_screen4(self,Screen_ind):
         self.uic.tabWidget.setCurrentWidget(self.uic.Calib_laser)
     def show_screen5(self,Screen_ind):
@@ -170,6 +175,7 @@ class MainWindow:
     # function for page 1 eye to hand#
     def start_calib_ex(self):
         self.pos_no_ex = 1
+        self.flag_calib_ex = 1
         if (self.VisionSystem_ex.flag_cam_ex == 1 & self.Robot_ex.flag_robot_ex == 1):
             self.VisionSystem_ex.start()
             self.Robot_ex.start()
@@ -178,111 +184,134 @@ class MainWindow:
             self.uic.infor_process_ex.addItem("Connection error with acA3800-10gm")
         if self.Robot_ex.flag_robot_ex == 0:
             self.uic.infor_process_ex.addItem("Robot connection error")
-
+        self.uic.infor_process_ex.scrollToBottom()
     def move_robot_ex(self):
-        trajectory = open(robot_path_ex, "r")
-        waypoint = len(trajectory.readlines())
-        print("move")
-        if self.pos_no_ex <= waypoint:
-            a = self.Robot_ex.read_pos_from_txt(self.pos_no_ex)
-            print(f"ROBOT TO WAYPOINT {self.pos_no_ex}...")
-            self.uic.infor_process_ex.addItem(f"ROBOT TO WAYPOINT {self.pos_no_ex}...")
-            self.Robot_ex.robot_move_to_pos(a)
-            print(a)
-            time.sleep(2)
-            self.pos_no_ex += 1
-            if self.pos_no_ex == waypoint + 1:
-                print("----------ROBOT TRAJECTORY IS FINISHED----------\nInput 'r' to return...")
-                self.uic.infor_process_ex.addItem("----------ROBOT TRAJECTORY IS FINISHED----------")
+        if self.flag_calib_ex == 1:
+            trajectory = open(robot_path_ex, "r")
+            waypoint = len(trajectory.readlines())
+            print("move")
+            if self.pos_no_ex <= waypoint:
+                a = self.Robot_ex.read_pos_from_txt(self.pos_no_ex)
+                print(f"ROBOT TO WAYPOINT {self.pos_no_ex}...")
+                self.uic.infor_process_ex.addItem(f"ROBOT TO WAYPOINT {self.pos_no_ex}...")
+                self.Robot_ex.robot_move_to_pos(a)
+                print(a)
+                time.sleep(2)
+                self.pos_no_ex += 1
+                if self.pos_no_ex == waypoint + 1:
+                    print("----------ROBOT TRAJECTORY IS FINISHED----------\nInput 'r' to return...")
+                    self.uic.infor_process_ex.addItem("----------ROBOT TRAJECTORY IS FINISHED----------")
+            else:
+                self.pos_no_ex = 1
+                a = self.Robot_ex.read_pos_from_txt(self.pos_no_ex)
+                print("\nReturning to first waypoint...")
+                self.uic.infor_process_ex.addItem("Returning to first waypoint...")
+                print(f"ROBOT TO WAYPOINT {self.pos_no_ex}...")
+                self.uic.infor_process_ex.addItem(f"ROBOT TO WAYPOINT {self.pos_no_ex}...")
+                self.Robot_ex.robot_move_to_pos(a)
+                print(a)
+                time.sleep(2)
+                self.pos_no_ex += 1
         else:
-            self.pos_no_ex = 1
-            a = self.Robot_ex.read_pos_from_txt(self.pos_no_ex)
-            print("\nReturning to first waypoint...")
-            self.uic.infor_process_ex.addItem("Returning to first waypoint...")
-            print(f"ROBOT TO WAYPOINT {self.pos_no_ex}...")
-            self.uic.infor_process_ex.addItem(f"ROBOT TO WAYPOINT {self.pos_no_ex}...")
-            self.Robot_ex.robot_move_to_pos(a)
-            print(a)
-            time.sleep(2)
-            self.pos_no_ex += 1
+            self.uic.infor_process_ex.addItem("Click Start please")
+        self.uic.infor_process_ex.scrollToBottom()
     def get_pos_ex(self):
-        self.Robot_ex.read_pos_from_robot()
-        R, t = self.Robot_ex.read()
-        print(f'\nTRANSFORMATION AT WAYPOINT {self.pos_no_ex - 1}:')
-        self.uic.infor_process_ex.addItem(f'TRANSFORMATION AT WAYPOINT {self.pos_no_ex - 1}:')
-        print('Rotation R:\n', R)
-        self.uic.infor_process_ex.addItem('Rotation R:')
-        self.uic.infor_process_ex.addItem(str(R))
-        print('Translation T:\n', t)
-        self.uic.infor_process_ex.addItem('Translation T:')
-        self.uic.infor_process_ex.addItem(str(t))
-        self.R_end2base_ex.append(R)
-        self.T_end2base_ex.append(t)
-        # self.i = ""
+        if self.flag_calib_ex == 1:
+            self.Robot_ex.read_pos_from_robot()
+            R, t = self.Robot_ex.read()
+            print(f'\nTRANSFORMATION AT WAYPOINT {self.pos_no_ex - 1}:')
+            self.uic.infor_process_ex.addItem(f'TRANSFORMATION AT WAYPOINT {self.pos_no_ex - 1}:')
+            print('Rotation R:\n', R)
+            self.uic.infor_process_ex.addItem('Rotation R:')
+            self.uic.infor_process_ex.addItem(str(R))
+            print('Translation T:\n', t)
+            self.uic.infor_process_ex.addItem('Translation T:')
+            self.uic.infor_process_ex.addItem(str(t))
+            self.R_end2base_ex.append(R)
+            self.T_end2base_ex.append(t)
+        else:
+            self.uic.infor_process_ex.addItem("Click Start please")
+        self.uic.infor_process_ex.scrollToBottom()
         time.sleep(0.5)
     def save_pos_ex(self):
-        RR = np.array(self.R_end2base_ex)
-        TT = np.array(self.T_end2base_ex)
-        self.Robot_ex.save(R_path_ex, RR)
-        self.Robot_ex.save(t_path_ex, TT)
-        print('ALL WAYPOINT TRANSFORMATIONS SAVED!')
-        self.uic.infor_process_ex.addItem('ALL WAYPOINT TRANSFORMATIONS SAVED!')
-        # self.i = ""
+        if self.flag_calib_ex == 1:
+            RR = np.array(self.R_end2base_ex)
+            TT = np.array(self.T_end2base_ex)
+            self.Robot_ex.save(R_path_ex, RR)
+            self.Robot_ex.save(t_path_ex, TT)
+            print('ALL WAYPOINT TRANSFORMATIONS SAVED!')
+            self.uic.infor_process_ex.addItem('ALL WAYPOINT TRANSFORMATIONS SAVED!')
+        else:
+            self.uic.infor_process_ex.addItem("Click Start please")
+        self.uic.infor_process_ex.scrollToBottom()
         time.sleep(3)
     def capture_image_ex(self):
-        self.show_calib_img_ex()
-        self.check_count_ex += 1
-        # To start number with 0, e.g, 01 02 03 ... 09 10 11 12 ... 99
-        if self.check_count_ex < 10:
-            self.filename = check_path_ex + "\checkerboard_0" + str(self.check_count_ex) + '.jpg'
-            # print("filename",self.filename)
-        elif 10<self.check_count_ex <= 16:
-            self.filename = check_path_ex + "\checkerboard_" + str(self.check_count_ex) + '.jpg'
+        if self.flag_calib_ex == 1:
+            self.show_calib_img_ex()
+            self.check_count_ex += 1
+            # To start number with 0, e.g, 01 02 03 ... 09 10 11 12 ... 99
+            if self.check_count_ex < 10:
+                self.filename = check_path_ex + "\checkerboard_0" + str(self.check_count_ex) + '.jpg'
+                # print("filename",self.filename)
+            elif 10 <= self.check_count_ex <= 16:
+                self.filename = check_path_ex + "\checkerboard_" + str(self.check_count_ex) + '.jpg'
+            else:
+                self.check_count_ex =0
+                print("out of range")
+                self.uic.infor_process_ex.addItem("out of range")
+            cv.imwrite(self.filename, self.VisionSystem_ex.image)
+            print('Captured checkerboard image\nPair %d ' % (self.check_count_ex))
+            self.uic.infor_process_ex.addItem('Captured checkerboard image')
+            self.uic.infor_process_ex.addItem("Pair %d" % (self.check_count_ex))
         else:
-            self.check_count_ex =0
-            print("out of range")
-            self.uic.infor_process_ex.addItem("out of range")
-        cv.imwrite(self.filename, self.VisionSystem_ex.image)
-        print('Captured checkerboard image\nPair %d ' % (self.check_count_ex))
-        self.uic.infor_process_ex.addItem('Captured checkerboard image')
-        self.uic.infor_process_ex.addItem("Pair %d" % (self.check_count_ex))
+            self.uic.infor_process_ex.addItem("Click Start please")
+        self.uic.infor_process_ex.scrollToBottom()
     def capture_checker_ex(self):
-        self.show_calib_img_ex()
-        self.check_laser_count_ex += 1
-        # To start number with 0, e.g, 01 02 03 ... 09 10 11 12 ... 99
-        if self.check_laser_count_ex < 10:
-            self.filename = laser_path_ex + "\checker_0" + str(self.check_laser_count_ex) + '.jpg'
-        elif 10 < self.check_laser_count_ex <= 16:
-            self.filename = laser_path_ex + "\checker_" + str(self.check_laser_count_ex) + '.jpg'
+        if self.flag_calib_ex == 1:
+            self.show_calib_img_ex()
+            self.check_laser_count_ex += 1
+            # To start number with 0, e.g, 01 02 03 ... 09 10 11 12 ... 99
+            if self.check_laser_count_ex < 10:
+                self.filename = laser_path_ex + "\checker_0" + str(self.check_laser_count_ex) + '.jpg'
+            elif 10 <= self.check_laser_count_ex <= 16:
+                self.filename = laser_path_ex + "\checker_" + str(self.check_laser_count_ex) + '.jpg'
+            else:
+                self.check_laser_count_ex = 0
+                print("out of range")
+                self.uic.infor_process_ex.addItem("out of range")
+            cv.imwrite(self.filename, self.VisionSystem_ex.image)
+            print('Captured checker laser image\nPair %d ' % (self.check_laser_count_ex))
+            self.uic.infor_process_ex.addItem('Captured checker laser image')
+            self.uic.infor_process_ex.addItem('Pair %d ' % (self.check_laser_count_ex))
         else:
-            self.check_laser_count_ex = 0
-            print("out of range")
-            self.uic.infor_process_ex.addItem("out of range")
-        cv.imwrite(self.filename, self.VisionSystem_ex.image)
-        print('Captured checker laser image\nPair %d ' % (self.check_laser_count_ex))
-        self.uic.infor_process_ex.addItem('Captured checker laser image')
-        self.uic.infor_process_ex.addItem('Pair %d ' % (self.check_laser_count_ex))
+            self.uic.infor_process_ex.addItem("Click Start please")
+        self.uic.infor_process_ex.scrollToBottom()
     def capture_laser_ex(self):
-        self.show_calib_img_ex()
-        self.laser_count_ex += 1
-        # To start number with 0, e.g, 01 02 03 ... 09 10 11 12 ... 99
-        if self.laser_count_ex < 10:
-            self.filename = laser_path_ex + "\laser_0" + str(self.laser_count_ex) + '.jpg'
-        elif 10 < self.laser_count_ex <=16:
-            self.filename = laser_path_ex + "\laser_" + str(self.laser_count_ex) + '.jpg'
+        if self.flag_calib_ex == 1:
+            self.show_calib_img_ex()
+            self.laser_count_ex += 1
+            # To start number with 0, e.g, 01 02 03 ... 09 10 11 12 ... 99
+            if self.laser_count_ex < 10:
+                self.filename = laser_path_ex + "\laser_0" + str(self.laser_count_ex) + '.jpg'
+            elif 10 <= self.laser_count_ex <=16:
+                self.filename = laser_path_ex + "\laser_" + str(self.laser_count_ex) + '.jpg'
+            else:
+                self.laser_count_ex =0
+                print("out of range")
+                self.uic.infor_process_ex.addItem("out of range")
+            cv.imwrite(self.filename, self.VisionSystem_ex.image)
+            print('Captured laser line image\nPair %d ' % (self.laser_count_ex))
+            self.uic.infor_process_ex.addItem('Captured laser line image')
+            self.uic.infor_process_ex.addItem('Pair %d ' % (self.laser_count_ex))
         else:
-            self.laser_count_ex =0
-            print("out of range")
-            self.uic.infor_process_ex.addItem("out of range")
-        cv.imwrite(self.filename, self.VisionSystem_ex.image)
-        print('Captured laser line image\nPair %d ' % (self.laser_count_ex))
-        self.uic.infor_process_ex.addItem('Captured laser line image')
-        self.uic.infor_process_ex.addItem('Pair %d ' % (self.laser_count_ex))
+            self.uic.infor_process_ex.addItem("Click Start please")
+        self.uic.infor_process_ex.scrollToBottom()
     def quit_ex(self):
         self.VisionSystem_ex.stop()
         self.Robot_ex.stop()
         print("End Process")
         self.uic.infor_process_ex.addItem("End Process")
+        self.uic.infor_process_ex.scrollToBottom()
     def show_calib_img_ex(self):
         # result_path = r"E:/New_Code/App_Data/Test_eye_to_hand/result.jpg"
         # self.img = cv.imread(result_path)
@@ -294,9 +323,10 @@ class MainWindow:
         self.img = QtGui.QImage(self.img.data, width, height, bytesPerLine, QtGui.QImage.Format_Grayscale8)
         self.uic.show_image_calib_ex.setPixmap(QtGui.QPixmap.fromImage(self.img))
 
-    # function for page 2 eye to hand#
+    # function for page 2 eye in hand#
     def start_calib_in(self):
         self.pos_no_in = 1
+        self.flag_calib_in = 1
         if (self.VisionSystem_in.flag_cam_in == 1 & self.Robot_in.flag_robot == 1):
             self.VisionSystem_in.start()
             self.Robot_in.start()
@@ -305,109 +335,133 @@ class MainWindow:
             self.uic.infor_process_in.addItem("Connection error with acA1920-40gm")
         if self.Robot_in.flag_robot == 0:
             self.uic.infor_process_in.addItem("Robot connection error")
+        self.uic.infor_process_in.scrollToBottom()
     def move_robot_in(self):
-        trajectory = open(robot_path_in, "r")
-        waypoint = len(trajectory.readlines())
-        print("move")
-        if self.pos_no_in <= waypoint:
-            a = self.Robot_in.read_pos_from_txt(self.pos_no_in)
-            print(f"ROBOT TO WAYPOINT {self.pos_no_in}...")
-            self.uic.infor_process_in.addItem(f"ROBOT TO WAYPOINT {self.pos_no_in}...")
-            self.Robot_in.robot_move_to_pos(a)
-            print(a)
-            time.sleep(2)
-            self.pos_no_in += 1
-            if self.pos_no_in == waypoint + 1:
-                print("----------ROBOT TRAJECTORY IS FINISHED----------")
-                self.uic.infor_process_in.addItem("----------ROBOT TRAJECTORY IS FINISHED----------")
+        if self.flag_calib_in == 1:
+            trajectory = open(robot_path_in, "r")
+            waypoint = len(trajectory.readlines())
+            print("move")
+            if self.pos_no_in <= waypoint:
+                a = self.Robot_in.read_pos_from_txt(self.pos_no_in)
+                print(f"ROBOT TO WAYPOINT {self.pos_no_in}...")
+                self.uic.infor_process_in.addItem(f"ROBOT TO WAYPOINT {self.pos_no_in}...")
+                self.Robot_in.robot_move_to_pos(a)
+                print(a)
+                time.sleep(2)
+                self.pos_no_in += 1
+                if self.pos_no_in == waypoint + 1:
+                    print("----------ROBOT TRAJECTORY IS FINISHED----------")
+                    self.uic.infor_process_in.addItem("----------ROBOT TRAJECTORY IS FINISHED----------")
+            else:
+                self.pos_no_in = 1
+                a = self.Robot_in.read_pos_from_txt(self.pos_no_in)
+                print("\nReturning to first waypoint...")
+                self.uic.infor_process_in.addItem("Returning to first waypoint...")
+                print(f"ROBOT TO WAYPOINT {self.pos_no_in}...")
+                self.uic.infor_process_in.addItem("fROBOT TO WAYPOINT {self.pos_no_in}...")
+                self.Robot_in.robot_move_to_pos(a)
+                print(a)
+                time.sleep(2)
+                self.pos_no_in += 1
         else:
-            self.pos_no_in = 1
-            a = self.Robot_in.read_pos_from_txt(self.pos_no_in)
-            print("\nReturning to first waypoint...")
-            self.uic.infor_process_in.addItem("Returning to first waypoint...")
-            print(f"ROBOT TO WAYPOINT {self.pos_no_in}...")
-            self.uic.infor_process_in.addItem("fROBOT TO WAYPOINT {self.pos_no_in}...")
-            self.Robot_in.robot_move_to_pos(a)
-            print(a)
-            time.sleep(2)
-            self.pos_no_in += 1
+            self.uic.infor_process_in.addItem("Click Start please")
+        self.uic.infor_process_in.scrollToBottom()
     def get_pos_in(self):
-        self.Robot_in.read_pos_from_robot()
-        R, t = self.Robot_in.read()
-        print(f'\nTRANSFORMATION AT WAYPOINT {self.pos_no_in - 1}:')
-        self.uic.infor_process_in.addItem(f'\nTRANSFORMATION AT WAYPOINT {self.pos_no_in - 1}:')
-        print('Rotation R:\n', R)
-        self.uic.infor_process_in.addItem("Rotation R:")
-        self.uic.infor_process_in.addItem(str(R))
-        print('Translation T:\n', t)
-        self.uic.infor_process_in.addItem("Translation T:")
-        self.uic.infor_process_in.addItem(str(t))
-        self.R_end2base_in.append(R)
-        self.T_end2base_in.append(t)
-        # self.i = ""
+        if self.flag_calib_in == 1:
+            self.Robot_in.read_pos_from_robot()
+            R, t = self.Robot_in.read()
+            print(f'\nTRANSFORMATION AT WAYPOINT {self.pos_no_in - 1}:')
+            self.uic.infor_process_in.addItem(f'\nTRANSFORMATION AT WAYPOINT {self.pos_no_in - 1}:')
+            print('Rotation R:\n', R)
+            self.uic.infor_process_in.addItem("Rotation R:")
+            self.uic.infor_process_in.addItem(str(R))
+            print('Translation T:\n', t)
+            self.uic.infor_process_in.addItem("Translation T:")
+            self.uic.infor_process_in.addItem(str(t))
+            self.R_end2base_in.append(R)
+            self.T_end2base_in.append(t)
+        else:
+            self.uic.infor_process_in.addItem("Click Start please")
+        self.uic.infor_process_in.scrollToBottom()
         time.sleep(0.5)
     def save_pos_in(self):
-        RR = np.array(self.R_end2base_in)
-        TT = np.array(self.T_end2base_in)
-        self.Robot_in.save(R_path_in, RR)
-        self.Robot_in.save(t_path_in, TT)
-        print('ALL WAYPOINT TRANSFORMATIONS SAVED!')
-        self.uic.infor_process_in.addItem('ALL WAYPOINT TRANSFORMATIONS SAVED!')
-        # self.i = ""
+        if self.flag_calib_in == 1:
+            RR = np.array(self.R_end2base_in)
+            TT = np.array(self.T_end2base_in)
+            self.Robot_in.save(R_path_in, RR)
+            self.Robot_in.save(t_path_in, TT)
+            print('ALL WAYPOINT TRANSFORMATIONS SAVED!')
+            self.uic.infor_process_in.addItem('ALL WAYPOINT TRANSFORMATIONS SAVED!')
+        else:
+            self.uic.infor_process_in.addItem("Click Start please")
+        self.uic.infor_process_in.scrollToBottom()
         time.sleep(3)
     def capture_image_in(self):
-        self.show_calib_img_in()
-        self.check_count_in += 1
-        # To start number with 0, e.g, 01 02 03 ... 09 10 11 12 ... 99
-        if self.check_count_in < 10:
-            self.filename = check_path_in + "\checkerboard_0" + str(self.check_count_in) + '.jpg'
-        elif 10 < self.check_count_ex <= 16:
-            self.filename = check_path_in + "\checkerboard_" + str(self.check_count_in) + '.jpg'
+        if self.flag_calib_in == 1:
+            self.show_calib_img_in()
+            self.check_count_in += 1
+            # To start number with 0, e.g, 01 02 03 ... 09 10 11 12 ... 99
+            if self.check_count_in < 10:
+                self.filename = check_path_in + "\checkerboard_0" + str(self.check_count_in) + '.jpg'
+            elif 10 <= self.check_count_in <= 16:
+                self.filename = check_path_in + "\checkerboard_" + str(self.check_count_in) + '.jpg'
+            else:
+                self.check_count_in =0
+                print("out of range")
+                self.uic.infor_process_in.addItem("out of range")
+            cv.imwrite(self.filename, self.VisionSystem_in.image)
+            print('Captured checkerboard image\nPair %d ' % (self.check_count_in))
+            self.uic.infor_process_in.addItem('Captured checkerboard image')
+            self.uic.infor_process_in.addItem('Pair %d'% (self.check_count_in))
         else:
-            self.check_count_in =0
-            print("out of range")
-            self.uic.infor_process_in.addItem("out of range")
-        cv.imwrite(self.filename, self.VisionSystem_in.image)
-        print('Captured checkerboard image\nPair %d ' % (self.check_count_in))
-        self.uic.infor_process_in.addItem('Captured checkerboard image')
-        self.uic.infor_process_in.addItem('Pair %d'% (self.check_count_in))
+            self.uic.infor_process_in.addItem("Click Start please")
+        self.uic.infor_process_in.scrollToBottom()
     def capture_checker_in(self):
-        self.show_calib_img_in()
-        self.check_laser_count_in += 1
-        # To start number with 0, e.g, 01 02 03 ... 09 10 11 12 ... 99
-        if self.check_laser_count_ex < 10:
-            self.filename = laser_path_in + "\checker_0" + str(self.check_laser_count_in) + '.jpg'
-        elif 10 < self.check_laser_count_in <= 16:
-            self.filename = laser_path_ex + "\checker_" + str(self.check_laser_count_in) + '.jpg'
+        if self.flag_calib_in == 1:
+            self.show_calib_img_in()
+            self.check_laser_count_in += 1
+            # To start number with 0, e.g, 01 02 03 ... 09 10 11 12 ... 99
+            if self.check_laser_count_in < 10:
+                self.filename = laser_path_in + "\checker_0" + str(self.check_laser_count_in) + '.jpg'
+            elif 10 <= self.check_laser_count_in <= 16:
+                self.filename = laser_path_in + "\checker_" + str(self.check_laser_count_in) + '.jpg'
+            else:
+                self.check_laser_count_in = 0
+                print("out of range")
+                self.uic.infor_process_in.addItem("out of range")
+            cv.imwrite(self.filename, self.VisionSystem_in.image)
+            print('Captured checker laser image\nPair %d ' % (self.check_laser_count_in))
+            self.uic.infor_process_in.addItem('Captured checker laser image')
+            self.uic.infor_process_in.addItem('Pair %d ' % (self.check_laser_count_in))
         else:
-            self.check_laser_count_in = 0
-            print("out of range")
-            self.uic.infor_process_in.addItem("out of range")
-        cv.imwrite(self.filename, self.VisionSystem_in.image)
-        print('Captured checker laser image\nPair %d ' % (self.check_laser_count_in))
-        self.uic.infor_process_in.addItem('Captured checker laser image')
-        self.uic.infor_process_in.addItem('Pair %d ' % (self.check_laser_count_in))
+            self.uic.infor_process_in.addItem("Click Start please")
+        self.uic.infor_process_in.scrollToBottom()
     def capture_laser_in(self):
-        self.show_calib_img_in()
-        self.laser_count_in += 1
-        # To start number with 0, e.g, 01 02 03 ... 09 10 11 12 ... 99
-        if self.laser_count_in < 10:
-            self.filename = laser_path_in + "\laser_0" + str(self.laser_count_in) + '.jpg'
-        elif 10 < self.laser_count_ex <=16:
-            self.filename = laser_path_in + "\laser_" + str(self.laser_count_in) + '.jpg'
+        if self.flag_calib_in == 1:
+            self.show_calib_img_in()
+            self.laser_count_in += 1
+            # To start number with 0, e.g, 01 02 03 ... 09 10 11 12 ... 99
+            if self.laser_count_in < 10:
+                self.filename = laser_path_in + "\laser_0" + str(self.laser_count_in) + '.jpg'
+            elif 10 <= self.laser_count_in <=16:
+                self.filename = laser_path_in + "\laser_" + str(self.laser_count_in) + '.jpg'
+            else:
+                self.laser_count_in =0
+                print("out of range")
+                self.uic.infor_process_in.addItem("out of range")
+            cv.imwrite(self.filename, self.VisionSystem_in.image)
+            print('Captured laser line image\nPair %d ' % (self.laser_count_in))
+            self.uic.infor_process_in.addItem('Captured laser line image')
+            self.uic.infor_process_in.addItem('Pair %d ' % (self.laser_count_in))
         else:
-            self.laser_count_in =0
-            print("out of range")
-            self.uic.infor_process_in.addItem("out of range")
-        cv.imwrite(self.filename, self.VisionSystem_in.image)
-        print('Captured laser line image\nPair %d ' % (self.laser_count_in))
-        self.uic.infor_process_in.addItem('Captured laser line image')
-        self.uic.infor_process_in.addItem('Pair %d ' % (self.laser_count_in))
+            self.uic.infor_process_in.addItem("Click Start please")
+        self.uic.infor_process_in.scrollToBottom()
     def quit_in(self):
         self.VisionSystem_in.stop()
         self.Robot_in.stop()
         print("End Process")
         self.uic.infor_process_in.addItem("End Process")
+        self.uic.infor_process_in.scrollToBottom()
     def show_calib_img_in(self):
         # result_path = r"E:/New_Code/App_Data/Test_eye_to_hand/result.jpg"
         # self.img = cv.imread(result_path)
@@ -511,6 +565,9 @@ class MainWindow:
                 self.ax.text(50, 0, 0, 'X', fontsize=10)
                 self.ax.text(0, 50, 0, 'Y', fontsize=10)
                 self.ax.text(0, 0, 50, 'Z', fontsize=10)
+                self.ax.set_xlim3d(-300, 300)
+                self.ax.set_ylim3d(-300, 300)
+                self.ax.set_zlim3d(400, 600)
                 # plt.show()
         self.uic.laser_ex_graph.addWidget(show_chart(self.point,self.plane))
     def calib_laser_internal_cam(self):
@@ -519,7 +576,7 @@ class MainWindow:
         for row in self.point:
             row_str = " ".join(str(val) for val in row)
             # print(row_str)
-        self.uic.infor_laser_in.addItem("Z = " + str(self.point[0][0]).strip('[]') + "X + " + str(self.point[1][0]).strip('[]') + "Y + "+str(self.point[2][0]).strip('[]'))
+        self.uic.infor_laser_in.addItem("Z = " + str(self.plane[0][0]).strip('[]') + "X + " + str(self.plane[1][0]).strip('[]') + "Y + "+str(self.plane[2][0]).strip('[]'))
         class show_chart(FigureCanvasQTAgg):
             def __init__(self,pointinlaserplane,plane):
                 X = np.array([0])
@@ -556,25 +613,39 @@ class MainWindow:
                 self.ax.text(50, 0, 0, 'X', fontsize=10)
                 self.ax.text(0, 50, 0, 'Y', fontsize=10)
                 self.ax.text(0, 0, 50, 'Z', fontsize=10)
+                self.ax.set_xlim3d(-300, 300)
+                self.ax.set_ylim3d(-300, 300)
+                self.ax.set_zlim3d(200, 600)
                 # plt.show()
         self.uic.laser_in_graph.addWidget(show_chart(self.point,self.plane))
 
     # function for page 5  ##
     def run_finding_trajectory(self):
-        self.find_tra.data_signal.connect(self.show_trajectory)
-        if self.find_tra.main_func():
-            self.show_result_eye_to_hand()
+        # self.find_tra.data_signal.connect(self.show_trajectory)
+        # if self.find_tra.main_func():
+        #     self.show_result_eye_to_hand()
+        self.show_result_eye_to_hand()
+        self.show_trajectory()
     def show_result_eye_to_hand(self):
         result_path = r"E:/New_Code/App_Data/Test_eye_to_hand/result.jpg"
+        time.sleep(10)
         self.img = cv.imread(result_path)
         self.img = cv.resize(self.img, (451, 331), interpolation=cv.INTER_AREA)
         height, width, channel = self.img.shape
         bytesPerLine = 3*width
         self.img = QtGui.QImage(self.img.data, width, height, bytesPerLine, QtGui.QImage.Format_RGB888).rgbSwapped()
         self.uic.show_image_ex.setPixmap(QtGui.QPixmap.fromImage(self.img))
-    def show_trajectory(self, message):
-        self.uic.output_scan_trajectory.addItem(message)
-
+    # def show_trajectory(self, message):
+    def show_trajectory(self):
+        # self.uic.output_scan_trajectory.addItem(message)
+        with open(scan_trajectory_path, 'r') as f:
+            positions = [[float(num) for num in line.split('\t')] for line in f]
+        Scan_point1 = positions[0]
+        Scan_point2 = positions[1]
+        self.uic.output_scan_trajectory.addItem("Start point")
+        self.uic.output_scan_trajectory.addItem(str(Scan_point1))
+        self.uic.output_scan_trajectory.addItem("Stop point")
+        self.uic.output_scan_trajectory.addItem(str(Scan_point2))
     ## function for page 6  ##
     ## main_scanning
     def run_main_scanning(self):
@@ -583,36 +654,114 @@ class MainWindow:
         #     def __init__(self):
         #         QObject.__init__(self)
         # def run_scan(self):
-        camera = Main_Scanning.CameraTask()
-        robot = Main_Scanning.RobotTask()
-        if (camera.flag_cam == 1 & robot.flag_robot == 1):
+        self.camera = Main_Scanning.CameraTask()
+        self.robot = Main_Scanning.RobotTask()
+        if (self.flag_scan == 1):
+            self.camera.stop()
+            self.robot.stop()
+            self.flag_scan = 0
+        if (self.camera.flag_cam == 1 & self.robot.flag_robot == 1):
 
             # software = SoftwareTask()
 
             print("--- Homing process ---")
             self.uic.Scanlist.addItem("--- Homing process ---")
-            robot.homing()
+            self.robot.homing()
             time.sleep(3)
             print("--- Homing process done ---")
             self.uic.Scanlist.addItem("--- Homing process done ---")
             print("--- Start Scanning ---")
             self.uic.Scanlist.addItem("--- Start Scanning ---")
             # Start new Threads
-            camera.start()
-            robot.start()
+            self.camera.start()
+            self.robot.start()
             # camera.stop()
             # camera.join()
             # robot.stop()
             # robot.join()
             self.uic.Scanlist.addItem("--- Scanning done ---")
+            self.flag_scan = 1
         else:
-            print("Done have connection with robot and camera")
+            print("Don't have connection with robot and camera")
             self.uic.Scanlist.addItem("Done have connection with robot, camera or both")
     ##scanning processing
     def show_diagram(self):
-        self.scanning_process.trajectory_signal.connect(self.show_result_scan)
+        # self.scanning_process.trajectory_signal.connect(self.show_result_scan)
+        WeldPoints = []
+        pos_no = 0
+
+        Images = glob.glob(r'E:/Thesis/App_Data/Scan_data4/weldseam' + '*.jpg')
+
+        Images.sort(key=ScanningProcessing.natural_keys)
+        # laser center line
+        # laser_center_1 = [785, 720]
+        # laser_center_2 = [785, 480]
+
+        print(Images)
+        with open(scan_pos_path, 'r') as f:
+            positions = [[float(num) for num in line.split('\t')] for line in f]
+        for image in Images:
+            img = cv.imread(image, cv.IMREAD_GRAYSCALE)
+            # laser line
+            laser_center_1, laser_center_2 = ScanningProcessing.get_laser_line(img)
+            laser_centerline = (laser_center_1, laser_center_2)
+            weldseam_center = ScanningProcessing.WeldSeamCenter(img=img)
+            for point in weldseam_center:
+                center = tuple(point)
+                cv.circle(img, center, 5, [255, 0, 0], 5)
+            # print(weldseam_center)
+            # cv.namedWindow('img', cv.WINDOW_NORMAL)
+            # cv.resizeWindow('img', 640,640)
+            # cv.imshow("img",img)
+            # cv.waitKey(0)
+            data = np.array(weldseam_center)
+            # RANSAC line fitting
+            model = LineModelND()
+            model_robust, inliers = ransac(data, LineModelND, min_samples=2,
+                                           residual_threshold=1, max_trials=1000)
+            outliers = inliers == False
+            line_x = [750, 800]
+            line_y_robust = model_robust.predict_y(line_x)
+            # weldseam line
+            weldseam_point_1 = [line_x[0], line_y_robust[0]]
+            weldseam_point_2 = [line_x[1], line_y_robust[1]]
+            weldseam = (weldseam_point_1, weldseam_point_2)
+                # find intersection
+            feature_point = ScanningProcessing.line_intersection(weldseam, laser_centerline)
+            pos = positions[pos_no - 1]
+            weldpoint2robot = ScanningProcessing.calc_weldpoint2robot(feature_point, pos)
+            # weldpoint2robot[2] = -35
+            weldpoint2robot_convert = ', '.join(str(i) for i in weldpoint2robot)
+            # self.data_signal.emit(weldpoint2robot_convert)
+            print(weldpoint2robot)
+            self.uic.Cal_trajectory.addItem((str(weldpoint2robot)))
+            # self.trajectory_signal.emit(weldpoint2robot_convert)
+            # self.trajectory_signal.emit("hihi")
+            pos_no += 1
+            WeldPoints.append(weldpoint2robot)
+            # show img
+            for p in weldseam_center:
+                cv.circle(img, (int(p[0]), int(p[1])), 1, (255, 255, 255), 1)
+            img[:, 700] = 255
+            img[:, 900] = 255
+            frame = cv.cvtColor(img, cv.COLOR_GRAY2RGB)
+            cv.circle(frame, (int(feature_point[0]), int(feature_point[1])), 5, (255, 0, 0), 5)
+            frame = cv.resize(frame, (870, 687), interpolation=cv.INTER_AREA)
+            img_name = 'E:/Thesis/App_Data/Scanning_img_after_processed/' + str(pos_no) + '.jpg'
+            cv.imwrite(img_name, frame)
+            if (pos_no >= np.shape(positions)[0]):
+                break
+
+        WeldPoints = np.array(WeldPoints)
+        WeldPoints[:, 2] = -634
+        ScanningProcessing.savematrix(welding_trajectory, WeldPoints)
+        # self.trajectory_signal.emit("hihi")
+        # illustrate the solution
+        self.X = WeldPoints[:, 0]
+        self.Y = WeldPoints[:, 1]
+        self.Z = WeldPoints[:, 2]
         # traj = ScanningProcessing.generate_trajectory()
-        self.X, self.Y, self.Z = self.scanning_process.main_scanning()
+        # self.X, self.Y, self.Z = self.scanning_process.main_scanning()
         class show_chart(FigureCanvasQTAgg):
             def __init__(self,X,Y,Z):
                 self.fig = plt.figure()
@@ -635,7 +784,8 @@ class MainWindow:
     def run_start_weld(self):
         robot = Main_Weld_Aft_Scan.RobotTask()
         # cam = Main_Weld_Aft_Scan.CameraTask()
-
+        sv = robot.robot.Servo("1")
+        print(sv)
         print("--- Homing process ---")
         self.uic.welding_process.addItem("--- Homing process ---")
         robot.homing()

@@ -177,3 +177,63 @@ class Yaskawa():
             response = self.client.recv(4096)
             commandDataResponse = repr(response)
         return commandDataResponse
+    def WriteIO(self, data):
+        #COMMAND request
+        command = data
+        commandLength = self.command_data_length(command)
+        commandRequest = "HOSTCTRL_REQUEST" + " " + "IOWRITE" + " " + str(commandLength) + CRLF
+        self.client.send(commandRequest.encode())
+        time.sleep(0.01)
+        response = self.client.recv(4096)      #4096: buffer size
+        commandResponse = repr(response)
+        if ('OK: ' + "IOWRITE" not in commandResponse):
+            print('[E] Command request response to DX100 is not successful!')
+            return
+        else:
+            #COMMAND DATA request
+            commandDataRequest = command + (CR if len(command) > 0 else '')
+            self.client.send(commandDataRequest.encode())
+            time.sleep(0.01)
+            response = self.client.recv(4096)
+            commandDataResponse = repr(response)
+        return commandDataResponse
+    def Servo(self, data):
+        #COMMAND request
+        command = data
+        commandLength = self.command_data_length(command)
+        commandRequest = "HOSTCTRL_REQUEST" + " " + "SVON" + " " + str(commandLength) + CRLF
+        self.client.send(commandRequest.encode())
+        time.sleep(0.01)
+        response = self.client.recv(4096)      #4096: buffer size
+        commandResponse = repr(response)
+        if ('OK: ' + "SVON" not in commandResponse):
+            print('[E] Command request response to DX100 is not successful!')
+            return
+        else:
+            #COMMAND DATA request
+            commandDataRequest = command + (CR if len(command) > 0 else '')
+            self.client.send(commandDataRequest.encode())
+            time.sleep(0.01)
+            response = self.client.recv(4096)
+            commandDataResponse = repr(response)
+        return commandDataResponse
+    def Read(self, data):
+        #COMMAND request
+        command = data
+        commandLength = self.command_data_length(command)
+        commandRequest = "HOSTCTRL_REQUEST" + " " + "IOREAD" + " " + str(commandLength) + CRLF
+        self.client.send(commandRequest.encode())
+        time.sleep(0.01)
+        response = self.client.recv(4096)      #4096: buffer size
+        commandResponse = repr(response)
+        if ('OK: ' + "IOREAD" not in commandResponse):
+            print('[E] Command request response to DX100 is not successful!')
+            return
+        else:
+            #COMMAND DATA request
+            commandDataRequest = command + (CR if len(command) > 0 else '')
+            self.client.send(commandDataRequest.encode())
+            time.sleep(0.01)
+            response = self.client.recv(4096)
+            commandDataResponse = repr(response)
+        return commandDataResponse

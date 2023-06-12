@@ -150,9 +150,9 @@ def handeyeCalibrate():
                 cv.Rodrigues(rvec, rotation_matrix)
                 R_target2cam.append(rotation_matrix)
                 t_target2cam.append(tvec)
-                # resized = cv.resize(img, (720, 480), interpolation = cv.INTER_AREA)
-                # cv.imshow("pic: ", resized)
-                # cv.waitKey(0)
+                resized = cv.resize(img, (720, 480), interpolation = cv.INTER_AREA)
+                cv.imshow("pic: ", resized)
+                cv.waitKey(0)
         else:
             print('Faild')
             pass

@@ -1,13 +1,15 @@
 # Images path
 checkerboard_calib_cam_path = 'E:/Thesis/App_Data/checkerboard_calib_cam/'
 checkerboard_calib_laser_path = 'E:/Thesis/App_Data/Checkerboard_calib_laser/'
-scan_weld_seam_img_path = 'E:/Thesis/App_Data/Scan_data2'
+scan_weld_seam_img_path = 'E:/Thesis/App_Data/Scan_data4'
+scan_weld_seam_img_path_Tshape = 'E:/Thesis/App_Data/Scan_data3'
 data_train_path = 'E:/Thesis/App_Data/Training_data'
 # Robot trajectory path
 Get_data_trajectory = 'E:/Thesis/Trajectory_Task/Get_data_trajectory.txt'
 calib_trajectory = 'E:/Thesis/Trajectory_Task/Calib_trajectory.txt'
 # laser_calib_trajectory = r'D:\Code\3D_Laser_Vision_Welding_Robot\RobotTrajectory\laser_calib_trajectory.txt'
 welding_trajectory = 'E:/Thesis/Trajectory_Task/welding_trajectory.txt'
+welding_trajectory_Tshape = 'E:/Thesis/Trajectory_Task/welding_trajectory_Tshape.txt'
 welding_trajectory_filtered =  'E:/Thesis/Trajectory_Task/welding_trajectory_filtered.txt'
 scan_trajectory_path = "E:/Thesis/Trajectory_Task/Scan_trajectory.txt"
 # Camera parameters - xml and txt files

@@ -97,17 +97,17 @@ def LaserPosition(width,height,chessPath,LaserPath):
     # print(chessPath)
     line = vis.LaserCenter_ex(thinned)
     inv = np.linalg.inv(rotation_matrix)
-    for i in range(500,rows-200,1):
-        for j in range(600,cols-300,1):
+    for i in range(700,rows-1400,1):
+        for j in range(1100,cols-700,1):
             if line[i][j] == 255:
                 cv.circle(laser_undis, (j,i), 5, [0,255,0], 2)
                 Zc = (tvec[0][0] * inv[2][0] +  tvec[1][0] * inv[2][1] + tvec[2][0] * inv[2][2])/(inv[2][0]/fx*(j-cx) + inv[2][1]/fy*(i-cy) + inv[2][2])
                 C = np.array([Zc/fx*(j-cx), Zc/fy*(i-cy), Zc]).T.reshape(3,1)
                 pointinlaserplane.append(C)
-    laser_undis[500,:] = 255
-    laser_undis[rows - 200,:] = 255
-    laser_undis[:,600] = 255
-    laser_undis[:,cols-300] = 255
+    laser_undis[700,:] = 255
+    laser_undis[rows - 1400,:] = 255
+    laser_undis[:,1100] = 255
+    laser_undis[:,cols-700] = 255
     laser_undis = cv.resize(laser_undis, (870,687), interpolation = cv.INTER_AREA)
     chess_undis = cv.resize(chess_undis, (870,687), interpolation = cv.INTER_AREA)
     # temp1 = cv.resize(temp1, (870,687), interpolation = cv.INTER_AREA)

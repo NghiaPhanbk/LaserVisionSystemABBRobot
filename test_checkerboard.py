@@ -19,7 +19,7 @@ objp = objp * square_size  # Create real world coords. Use your metric.
 objpoints = [] # 3d point in real world space
 imgpoints = [] # 2d points in image plane.
 # images = glob.glob(r'D:\Code\test\test6\*.bmp')
-images = glob.glob(r'E:\New_Code\App_Data\Checkerboard_calib_eye_to_hand\*.jpg')
+images = glob.glob(r'E:\Thesis\App_Data\Checkerboard_calib_cam\*.jpg')
 print(images)
 # for fname in images:
 for fname in images:

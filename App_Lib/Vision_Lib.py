@@ -5,7 +5,7 @@ from App_Lib.App import *
 import socket
 import time
 
-from GlobalVariables import camera_external_params
+# from GlobalVariables import camera_external_params
 
 
 class Vision():
@@ -30,7 +30,7 @@ class Vision():
         # blur = cv.GaussianBlur(grayimg,(7,7),0)
         blur = cv.GaussianBlur(img,(7,7),0)                 # use when img is gray image
         # _, thresh = cv.threshold(blur,80,255,cv.THRESH_BINARY)
-        _, thresh = cv.threshold(blur, 100, 255, cv.THRESH_BINARY)
+        _, thresh = cv.threshold(blur, 60, 255, cv.THRESH_BINARY)
         closing = thresh
         del blur
         for _ in range(7):
@@ -44,7 +44,7 @@ class Vision():
         # blur = cv.GaussianBlur(grayimg,(7,7),0)
         blur = cv.GaussianBlur(img,(7,7),0)                 # use when img is gray image
         # _, thresh = cv.threshold(blur,80,255,cv.THRESH_BINARY)
-        _, thresh = cv.threshold(blur, 100, 255, cv.THRESH_BINARY)
+        _, thresh = cv.threshold(blur, 120, 255, cv.THRESH_BINARY)
         closing = thresh
         del blur
         for _ in range(7):

@@ -16,7 +16,7 @@ with open(scan_trajectory_path, 'r') as f:
 # positions = np.array(positions)
 Scan_point1 = positions[0]
 Scan_point2 = positions[1]
-Scan_HomePos = Scan_point2  # butt welding spline
+Scan_HomePos = Scan_point1  # butt welding spline
 # Scan_HomePos =
 Scan_StartPos = Scan_point1
 Scan_EndPos = Scan_point2
@@ -90,7 +90,7 @@ class RobotTask(threading.Thread):
             count = 1
             while StartScanning:
                 self.robot.MovL(self.pos2Movlcommand(Scan_EndPos))
-                time.sleep(0.05)
+                time.sleep(0.5)
                 while True:
                     img_name = scan_weld_seam_img_path + "\weldseam_" + str(count) + '.jpg'
                     CurrentPos = self.robot.RposC()
@@ -98,7 +98,7 @@ class RobotTask(threading.Thread):
                     cv.imwrite(img_name, CurrImg)
                     print('pos no: ', count)
                     # self.data_signal.emit("pos no: {}".format(str(count)))
-                    time.sleep(0.05)
+                    time.sleep(0.02)
                     count += 1
                     if CurrentPos[0] >= Scan_point2[0] - 5:
                         StartScanning = False
@@ -145,7 +145,7 @@ class CameraTask(threading.Thread):
             self.camera.Height.SetValue(1200)
             self.camera.OffsetX.SetValue(8)
             self.camera.OffsetY.SetValue(8)
-            self.camera.ExposureTimeAbs = 15000
+            self.camera.ExposureTimeAbs = 20000
             self.camera.StartGrabbing(pylon.GrabStrategy_LatestImages)
         else:
             print("Không tìm thấy thiết bị:", self.desired_model)

@@ -65,12 +65,11 @@ class BaslerCam():
         # self._tlFactory = pylon.TlFactory.GetInstance()
         # self._devices = self._tlFactory.EnumerateDevices()
         # self.camera = pylon.InstantCamera(pylon.TlFactory.GetInstance().CreateFirstDevice())
-        self.LaserOn = True
-        # self.LaserOn = False
+        self.LaserOn = True        # self.LaserOn = False
 
     def grabImg(self):
         if self.LaserOn == True:
-            self.camera.ExposureTimeAbs = 5000
+            self.camera.ExposureTimeAbs = 10000
         else:
             self.camera.ExposureTimeAbs = 25000
         self.camera.StartGrabbing()
@@ -94,7 +93,8 @@ class BaslerCam():
     def stop(self):
         self.started = False
         cv.destroyAllWindows()
-        self.camera.Close()
+        if self.flag_cam_ex ==1:
+            self.camera.Close()
 
     def start(self):
         threading.Thread(target=self.grabImg, args=()).start()
