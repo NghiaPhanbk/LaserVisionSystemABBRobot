@@ -105,25 +105,11 @@ def calc_weldpoint2robot(point, pos):
     weldpoint2robot    = tool2robot.dot(eye2hand).dot(weldpoint2camera).flatten()[0:3]
     return weldpoint2robot
 def get_laser_line(img):
-    # img = cv.imread(r"E:\New_Code\App_Data\Scan_data2\weldseam_36.jpg")
-    # gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-    # gray = img
-    # # apply Canny edge detection to identify the laser line
-    # edges = cv.Canny(gray, 100, 200)
-    # # find contours in the edges image
-    # contours, hierarchy = cv.findContours(edges, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
-    # img1 = cv.drawContours(gray, contours, -1, (255, 255, 255), 2)
+
     blur = cv.GaussianBlur(img, (7, 7), 0)  # use when img is gray image
     _, thresh = cv.threshold(blur, 100, 255, cv.THRESH_BINARY)
-    # cv.namedWindow('img', cv.WINDOW_NORMAL)
-    # cv.resizeWindow('img', 640,640)
-    # cv.imshow("img",thresh)
-    # cv.waitKey(0)
     thinned_contours = cv.ximgproc.thinning(thresh)
     line = LaserCenter(thinned_contours)
-    # rows, cols = thinned_contours.shape
-    # line = LaserCenter(thresh)
-    # print(line)
     rows, cols = thresh.shape
     points = []
     for i in range(500, 700, 1):
@@ -132,15 +118,6 @@ def get_laser_line(img):
                 # cv.circle(img, (j, i), 5, [255, 0, 0], 6)
                 points.append((j, i))
     points = np.array(points)
-    # print(points)
-    # print(points)
-    # m, b = np.polyfit(points[:, 0], points[:, 1], 1)
-    # x1 = 788
-    # y1 = m * x1 + b
-    # y1 = int(y1)
-    # x2 = 784
-    # y2 = m * x2 + b
-    # y2 = int(y2)
     model = LineModelND()
     model_robust, inliers = ransac(points, LineModelND, min_samples=2,
                                    residual_threshold=1, max_trials=1000)

@@ -7,7 +7,6 @@ data_train_path = 'E:/Thesis/App_Data/Training_data'
 # Robot trajectory path
 Get_data_trajectory = 'E:/Thesis/Trajectory_Task/Get_data_trajectory.txt'
 calib_trajectory = 'E:/Thesis/Trajectory_Task/Calib_trajectory.txt'
-# laser_calib_trajectory = r'D:\Code\3D_Laser_Vision_Welding_Robot\RobotTrajectory\laser_calib_trajectory.txt'
 welding_trajectory = 'E:/Thesis/Trajectory_Task/welding_trajectory.txt'
 welding_trajectory_Tshape = 'E:/Thesis/Trajectory_Task/welding_trajectory_Tshape.txt'
 welding_trajectory_filtered =  'E:/Thesis/Trajectory_Task/welding_trajectory_filtered.txt'

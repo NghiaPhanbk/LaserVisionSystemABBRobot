@@ -121,16 +121,6 @@ def LaserCenter(img,coords):
         for y in range(ymin, ymax):
             if img[y][x] == 255:
                 center[int(y)][int(x)] = 255
-    # # find the center point
-    # for x in range(center.shape[1]):
-    #     sum1 = 0.0
-    #     sum2 = 0.0
-    #     roi = np.where(img[:,x] == 255)
-    #     if roi[0].size != 0:
-    #         for y in roi[0]:
-    #             sum1 += y * img[y][x]
-    #             sum2 += img[y][x]
-    #         center[int(sum1/sum2)][x] = 255
     return center
 def Preprocessing(img):
     newcameramtx, _ =cv.getOptimalNewCameraMatrix(intrinsic,dist_coffs,(rows,cols),1,(rows,cols))
@@ -199,8 +189,7 @@ class find_trajectory(QObject):
         # camera = pylon.InstantCamera(pylon.TlFactory.GetInstance().CreateFirstDevice())
     def main_func(self):
         path = "E:/Thesis/App_Data/Test_eye_to_hand/test6.jpg"
-        # a = self.camera_task(path)
-        a=1
+        a = self.camera_task(path)
         """ Test finding scantrajectory"""
         if a == 1:
             model = YOLO("E:/Thesis/App_Data/best.pt")
@@ -256,8 +245,6 @@ class find_trajectory(QObject):
             bottom_edge = (point3,point4)
             # laser center line
             # Laser center is the column 716 of the image
-            # laser_center_1 = [716, 600]
-            # laser_center_2 = [716, 700]
             laser_centerline = (data[1], data[-2])
             # find intersection
             feature_point1 = line_intersection(top_edge, laser_centerline)

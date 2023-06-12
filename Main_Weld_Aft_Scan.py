@@ -72,9 +72,6 @@ class RobotTask(threading.Thread):
         while StartWelding:
             if pos_no == 1:
                 pos = positions[pos_no-1]
-                pos[0] -= 25
-                pos[1] += 28
-                pos[2] = -638
                 self.robot.MovL(self.pos2Movlcommand_start(pos))
                 time.sleep(10)
                 # self.robot.Stop()
@@ -85,9 +82,6 @@ class RobotTask(threading.Thread):
                 pos_no += 1
             elif pos_no <= waypoint:
                 pos = positions[pos_no-1]
-                pos[0] -= 25
-                pos[1] += 28
-                pos[2] = -638
                 self.robot.MovL(self.pos2Movlcommand(pos,ori))
                 time.sleep(0.02)
                 # time.sleep(0.2)
@@ -102,15 +96,9 @@ class RobotTask(threading.Thread):
                 if pos_no == waypoint + 1:
                     print('finished')
                     endpos = positions[waypoint-1]
-                    endpos[0] -= 25
-                    endpos[1] += 28
-                    endpos[2] = -620
                     self.robot.MovL(self.pos2Movlcommand(endpos, ori))
                     time.sleep(1)
                     self.robot.Stop()
-                    # self.robot.StartRequest()
-                    # off = self.robot.ArcOff()
-                    # print(off)
                     print('end pos')
             else:
                 StartWelding = False
@@ -123,27 +111,6 @@ class RobotTask(threading.Thread):
         if StartWelding:
             self.WeldProcess()
 
-# class CameraTask(threading.Thread):
-#     def __init__(self):
-#         threading.Thread.__init__(self)
-#         self.camera = pylon.InstantCamera(pylon.TlFactory.GetInstance().CreateFirstDevice())
-#         self.camera.Open()
-#         self.camera.Width.SetValue(1700)
-#         self.camera.Height.SetValue(1200)
-#         self.camera.OffsetX.SetValue(8)
-#         self.camera.OffsetY.SetValue(8)
-#         self.camera.ExposureTimeAbs = 20000
-#         self.camera.StartGrabbing()
-#
-#     def run(self):
-#         global StopProcess
-#         while self.camera.IsGrabbing() and not StopProcess:
-#             try:
-#                 grabResult = self.camera.RetrieveResult(5000, pylon.TimeoutHandling_ThrowException)
-#                 if grabResult.GrabSucceeded():
-#                     self.image = grabResult.Array
-#             except:
-#                 print("Camera error: ",sys.exc_info())
 
 
 if __name__ == "__main__":
@@ -163,7 +130,6 @@ if __name__ == "__main__":
     plt.show()
 
     robot = RobotTask()
-    # cam   = CameraTask()
 
     print("--- Homing process ---")
     robot.homing()

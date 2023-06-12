@@ -247,60 +247,11 @@ class RobotTask():
         return d
 
     def process(self):
-        # R_path
-        # t_path
-        # R_end2base = []
-        # T_end2base = []
-        # H_end2base_model = []
-        # pattern_count = 0
-        # pos_no = 1
         trajectory = open(self.robot_path, "r")
         waypoint = len(trajectory.readlines())
         print(f"There are {waypoint} waypoints in robot trajectory.")
         print('press "r" to move to the next waypoint, "t" to record the current waypoint, "s" to save.')
         print('press "c" to capture checkerboard, "v" to capture checkerboard for laser calib, "b" to  capture laser  "q" to quit')
-        # while not self.stopped:
-        #     # i = input()  # keyboard input
-        #     if self.i == "r":
-        #         if pos_no <= waypoint:
-        #             a = self.read_pos_from_txt(pos_no)
-        #             print(f"ROBOT TO WAYPOINT {pos_no}...")
-        #             self.robot_move_to_pos(a)
-        #             print(a)
-        #             time.sleep(2)
-        #             pos_no += 1
-        #             if pos_no == waypoint + 1:
-        #                 print("----------ROBOT TRAJECTORY IS FINISHED----------\nInput 'r' to return...")
-        #             # self.i = ""
-        #         else:
-        #             pos_no = 1
-        #             a = self.read_pos_from_txt(pos_no)
-        #             print("\nReturning to first waypoint...")
-        #             print(f"ROBOT TO WAYPOINT {pos_no}...")
-        #             self.robot_move_to_pos(a)
-        #             print(a)
-        #             time.sleep(2)
-        #             pos_no += 1
-        #             # self.i = ""
-        #     elif self.i == 't':
-        #         self.read_pos_from_robot()
-        #         R, t = self.read()
-        #         print(f'\nTRANSFORMATION AT WAYPOINT {pos_no - 1}:')
-        #         print('Rotation R:\n', R)
-        #         print('Translation T:\n', t)
-        #         R_end2base.append(R)
-        #         T_end2base.append(t)
-        #         # self.i = ""
-        #         time.sleep(0.5)
-        #     elif self.i == 's':
-        #         RR = np.array(R_end2base)
-        #         TT = np.array(T_end2base)
-        #         self.save(R_path, RR)
-        #         self.save(t_path, TT)
-        #         print('ALL WAYPOINT TRANSFORMATIONS SAVED!')
-        #         # self.i = ""
-        #         time.sleep(3)
-
     def stop(self):
         self.stopped = True
 

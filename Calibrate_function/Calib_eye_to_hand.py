@@ -175,7 +175,7 @@ def eyetohandCalibrate():
     # Use Daniilidis due to better accuracy than Tsai
     # Do not use Tsai due to poor accuracy
     # R_cam2gripper, t_cam2gripper = cv.calibrateHandEye(R_gripper2base, t_gripper2base, R_target2cam, t_target2cam, method=cv.CALIB_HAND_EYE_DANIILIDIS)
-    R_cam2base, t_cam2base = cv.calibrateHandEye(R_base2gripper, t_base2gripper, R_target2cam, t_target2cam,method = cv.CALIB_HAND_EYE_TSAI)
+    R_cam2base, t_cam2base = cv.calibrateHandEye(R_base2gripper, t_base2gripper, R_target2cam, t_target2cam,method = cv.CALIB_HAND_EYE_DANIILIDIS)
     # R_cam2gripper, t_cam2gripper = cv.calibrateHandEye(R_gripper2base, t_gripper2base, R_target2cam, t_target2cam, method = cv.CALIB_HAND_EYE_TSAI)
     end = time.time()
     
@@ -194,50 +194,4 @@ if __name__ == '__main__':
     '''
     test convert to R base to target
     '''
- #    # T_gripper_base = np.array([
- #    #     [0.7071, -0.7071, 0.0000, 0.0000],
- #    #     [0.7071, 0.7071, 0.0000, 0.0000],
- #    #     [0.0000, 0.0000, 1.0000, 0.1000],
- #    #     [0.0000, 0.0000, 0.0000, 1.0000]])
- #    # T_base_gripper = np.linalg.inv(T_gripper_base)
- #    # print(T_base_gripper)
- #    R = np.array([[ 9.27188431e-01,  6.53792075e-07,  3.74595266e-01],
- # [ 0.00000000e+00, -1.00000000e+00 , 1.74532925e-06],
- # [ 3.74595266e-01, -1.61824909e-06 ,-9.27188431e-01]])
- #    #
- #    t = np.array([ 761.995,  -30.994, -152.507])
- #    #
- #    # # compute the transformation matrix from base to gripper
- #    R_inv = np.transpose(R)
- #    t_inv = -np.dot(R_inv, t)
- #    print("R_inv",R_inv)
- #    print(" t_inv",t_inv)
- #    T_base_gripper = np.vstack((np.hstack((R_inv, t_inv.reshape((3, 1)))), np.array([0, 0, 0, 1])))
- #
- #    print(T_base_gripper)
- #    # R_inv[[9.27188431e-01  0.00000000e+00  3.74595266e-01]
- #    # [6.53792075e-07 - 1.00000000e+00 - 1.61824909e-06]
- #    # [3.74595266e-01
- #    # 1.74532925e-06 - 9.27188431e-01]]
- #    # t_inv[-649.38454825 - 30.99474498 - 426.84239167]
- #
- #    R_gripper2base = load_pos(R_path)
- #    t_gripper2base = load_pos(t_path)
- #    print('R_gripper2base:',R_gripper2base[1])
- #    print('t_gripper2base:', t_gripper2base[1])
- #    R_base2gripper = []
- #    for i in R_gripper2base:
- #        matrix = np.transpose(i)
- #        R_base2gripper.append(matrix)
- #    t_base2gripper = []
- #    k=0
- #    for j in t_gripper2base:
- #        vec = -np.dot(R_base2gripper[k], j)
- #        t_base2gripper.append(vec)
- #        k+=1
- #    # t_base2gripper = -np.dot(R_base2gripper[1], t_gripper2base[1])
- #    print('R_base2gripper:',R_base2gripper[15])
- #    print('R_t_base2gripper:',t_base2gripper[15])
-
- #end test.
     eyetohandCalibrate()

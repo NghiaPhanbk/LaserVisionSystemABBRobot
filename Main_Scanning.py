@@ -97,7 +97,6 @@ class RobotTask(threading.Thread):
                     NowPos.append(CurrentPos)
                     cv.imwrite(img_name, CurrImg)
                     print('pos no: ', count)
-                    # self.data_signal.emit("pos no: {}".format(str(count)))
                     time.sleep(0.02)
                     count += 1
                     if CurrentPos[0] >= Scan_point2[0] - 5:
@@ -108,9 +107,7 @@ class RobotTask(threading.Thread):
                 print('scanning done')
                 # self.data_signal.emit('scanning done')
             print('ImgArr length:\n', len(ImgArr))
-            # self.data_signal.emit("ImgArr length: {}".format(str(len(ImgArr))))
             print('NowPos length:\n', len(NowPos))
-            # self.data_signal.emit("ImgArr length: {}".format(str(len(NowPos))))
         else:
             print("No robot")
 
@@ -149,7 +146,6 @@ class CameraTask(threading.Thread):
             self.camera.StartGrabbing(pylon.GrabStrategy_LatestImages)
         else:
             print("Không tìm thấy thiết bị:", self.desired_model)
-            # self.data_signal.emit("Không tìm thấy thiết bị: {}".format(self.desired_model))
             self.flag_cam = 0
 
     def run(self):
@@ -168,27 +164,7 @@ class CameraTask(threading.Thread):
         self.stopped = True
 
 
-# class SoftwareTask(threading.Thread):
-#    def __init__(self):
-#       threading.Thread.__init__(self)
-#       self.vis = Vision()
-#       self.intrinsic = self.vis.intrinsic
-#       self.dist_coffs = self.vis.dist_coffs
-#       self.eye2hand = self.vis.eye2hand
-#       [self.a, self.b, self.c, self.d] = self.vis.plane
-#       self.fx = self.intrinsic[0][0]
-#       self.fy = self.intrinsic[1][1]
-#       self.cx = self.intrinsic[0][2]
-#       self.cy = self.intrinsic[1][2]
-#
-#    def run(self):
-#         pass
 if __name__ == '__main__':
-    # class main_scan(QObject):
-    #     data_signal = pyqtSignal(str)
-    #     def __init__(self):
-    #         QObject.__init__(self)
-    # def run_scan(self):
     camera = CameraTask()
     robot = RobotTask()
     print(robot.flag_robot)
@@ -197,13 +173,13 @@ if __name__ == '__main__':
         # software = SoftwareTask()
 
         print("--- Homing process ---")
-        # self.data_signal.emit("--- Homing process ---")
+
         robot.homing()
         time.sleep(3)
         print("--- Homing process done ---")
-        # self.data_signal.emit("--- Homing process done ---")
+
         print("--- Start Scanning ---")
-        # self.data_signal.emit("--- Start Scanning ---")
+
         # Start new Threads
         camera.start()
         robot.start()

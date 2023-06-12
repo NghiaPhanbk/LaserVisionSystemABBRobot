@@ -44,32 +44,12 @@ def trajectory_filter():
     print(positions.shape)
     positions = np.array(positions)
     positions1 = positions
-    # inliers_x = remove_outliers(positions[:, 0])
-    # inliers_y = remove_outliers(inliers_x[:, 1])
-
-
-
-## pp zscore
-    # z_scoresz = zscore(positions[:,2])
-    # thresholdz = 1.5
-    # positions = positions[abs(z_scoresz) < thresholdz]
-    # z_scoresx = zscore(positions[:,0])
-    # thresholdx = 2
-    # positions = positions[abs(z_scoresx) < thresholdx]
-    # z_scoresy = zscore(positions[:,1])
-    # thresholdy = 2
-    # positions = positions[abs(z_scoresy) < thresholdy]
 
 
 ## PP IQR cho toàn tập
     inliers_z = remove_outliers_z_iqr(positions)
     inliers_x = remove_outliers_x_iqr(inliers_z)
     inliers_y = remove_outliers_y_iqr(inliers_x)
-    # print(inliers_y)
-    # print(inliers_y.shape)
-    # diff = np.diff(inliers_y)
-    # outliers = np.concatenate((np.array([False]), np.ravel(np.abs(diff)) > 5, np.array([False])))
-    # inliers_y = inliers_y[~outliers]
     positions = inliers_y
 
 ## pp dùng LocalOutlierFactor
@@ -127,18 +107,7 @@ def trajectory_filter():
     ax.set_xlabel('x')
     ax.set_ylabel('y')
     ax.set_zlabel('z')
-    # plt.subplot(2, 1, 1)
-    # plt.show()
-    # X1 = positions1[:, 0]
-    # Y1= positions1[:, 1]
-    # Z1 = positions1[:, 2]
-    # fig1 = plt.figure()
-    # ax = fig1.add_subplot(111, projection="3d")
-    # ax.scatter(X1, Y1, Z1, c='r', marker='.')
-    # ax.set_xlabel('x')
-    # ax.set_ylabel('y')
-    # ax.set_zlabel('z')
-    # plt.subplot(2, 1, 2)
+
     plt.show()
     print(positions)
     savematrix(welding_trajectory_filtered, positions)

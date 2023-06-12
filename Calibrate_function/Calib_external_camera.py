@@ -1,5 +1,5 @@
 '''
-Code for camera calibration fnction
+Code for camera calibration function
     1. Load the camera images
     2. Extract the chessboard corners
     3. Calibrate the camera

@@ -221,8 +221,7 @@ for image in Images:
     print(feature_point)
     pos = positions[pos_no - 1]
     point1 = feature_point
-    Zc = 584.56
-    # Zc = -d / (a / fx * (point1[0] - cx) + b / fy * (point1[1] - cy) + c)
+    Zc = -d / (a / fx * (point1[0] - cx) + b / fy * (point1[1] - cy) + c)
     weldpoint2camera = np.array([[Zc / fx * (point1[0] - cx)], [Zc / fy * (point1[1] - cy)], [Zc], [1]])
     print("weldpoint2camera:", weldpoint2camera)
     weldpoint2robot = eye2hand.dot(weldpoint2camera).flatten()[0:3]
