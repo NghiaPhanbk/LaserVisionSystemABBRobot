@@ -98,8 +98,8 @@ def line_intersection(line1, line2):
     return int(x), int(y)
 
 def calc_weldpoint2robot(point, pos):
-    # Zc                 = -d / (a/fx*(point[0]-cx) + b/fy*(point[1] - cy) + c)
-    Zc = 320
+    Zc                 = -d / (a/fx*(point[0]-cx) + b/fy*(point[1] - cy) + c)
+    # Zc = 320
     weldpoint2camera   = np.array([[Zc/fx*(point[0]-cx)], [Zc/fy*(point[1]-cy)], [Zc] , [1]])
     tool2robot         = vis.homogeneous(pos)
     weldpoint2robot    = tool2robot.dot(eye2hand).dot(weldpoint2camera).flatten()[0:3]
