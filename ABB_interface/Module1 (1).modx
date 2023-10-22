@@ -1,0 +1,67 @@
+MODULE Module1
+    VAR socketdev temp_socket;
+    VAR socketdev client_socket;
+    VAR string str1;
+    VAR string str2;
+    VAR string str3;
+    VAR string str4;
+    VAR string Str_RobTrans_X;
+    VAR string Str_RobTrans_Y;
+    VAR string Str_RobTrans_Z;
+    VAR string Str_RobRot;
+    VAR pos Pos_RobTrans;
+    VAR string Pos_RobRot;
+    VAR num str4Len;
+    VAR num count;
+    PERS robtarget myRobtarget:=[[364.097,-99.2107,653.423],[0.118316,0.0812005,0.989249,0.0281752],[-1,0,-1,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+
+    PROC main()
+        SocketCreate temp_socket;
+        SocketBind temp_socket,"192.168.125.1",1025;
+        SocketListen temp_socket;
+        WHILE TRUE DO
+            SocketAccept temp_socket,client_socket;
+            SocketSend client_socket\Str:="Robot ready";
+            SocketReceive client_socket\Str:=str1\Time:=WAIT_MAX;
+            TPWrite "Client send message - "+str1;
+            str1:="";
+            SocketSend client_socket\Str:="Message acknowledged";
+            SocketReceive client_socket\Str:=str1\Time:=WAIT_MAX;
+            IF str1="RPOSC" THEN
+                !                SocketSend client_socket\Str:="OK:RPOSC";
+                myRobtarget:=CRobT(\Tool:=tool0\WObj:=wobj0);
+                str2:=ValToStr(myRobtarget.trans.x)+","+ValToStr(myRobtarget.trans.y)+","+ValToStr(myRobtarget.trans.z);
+                str3:=ValToStr(EulerZYX(\X,myRobtarget.rot))+","+ValToStr(EulerZYX(\Y,myRobtarget.rot))+","+ValToStr(EulerZYX(\Z,myRobtarget.rot));
+                SocketSend client_socket\Str:=str2+","+str3;
+            ENDIF
+        ENDWHILE
+        SocketClose client_socket;
+    ERROR
+        IF ERRNO=ERR_SOCK_TIMEOUT THEN
+            RETRY;
+        ELSEIF ERRNO=ERR_SOCK_CLOSED THEN
+            SocketClose temp_socket;
+            SocketClose client_socket;
+            SocketCreate temp_socket;
+            SocketBind temp_socket,"192.168.125.1",1025;
+            SocketListen temp_socket;
+            SocketAccept temp_socket,client_socket;
+        ELSE
+            TPWrite "ERRNO = "\Num:=ERRNO;
+            Stop;
+            RETRY;
+        ENDIF
+    ENDPROC
+
+    PROC ReqTarget()
+        SocketSend client_socket\Str:="Send Target";
+        SocketReceive client_socket\Str:=str4\Time:=WAIT_MAX;
+        str4Len := StrLen(str4);
+        FOR i FROM 2 TO str4Len-1 DO
+            IF StrFind(str4,i,",") <> i+1 THEN
+                Str_RobTrans_X := StrPart(str4,1,i);
+            ENDIF
+        ENDFOR
+        Str_RobTrans := "[" + StrPart(str4,1,1) + ",";
+    ENDPROC
+ENDMODULE

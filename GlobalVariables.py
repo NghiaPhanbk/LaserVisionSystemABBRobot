@@ -1,7 +1,7 @@
 # Images path
 checkerboard_calib_cam_path = 'E:/Thesis/App_Data/checkerboard_calib_cam/'
 checkerboard_calib_laser_path = 'E:/Thesis/App_Data/Checkerboard_calib_laser/'
-scan_weld_seam_img_path = 'E:/Thesis/App_Data/Scan_data4'
+scan_weld_seam_img_path = 'E:/Thesis/App_Data/Scan_data3'
 scan_weld_seam_img_path_Tshape = 'E:/Thesis/App_Data/Scan_data3'
 data_train_path = 'E:/Thesis/App_Data/Training_data'
 # Robot trajectory path

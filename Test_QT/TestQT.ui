@@ -36,219 +36,8 @@
      </size>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>2</number>
     </property>
-    <widget class="QWidget" name="eye_to_hand">
-     <attribute name="title">
-      <string>Eye to hand</string>
-     </attribute>
-     <widget class="QPushButton" name="Move_ex">
-      <property name="geometry">
-       <rect>
-        <x>60</x>
-        <y>120</y>
-        <width>121</width>
-        <height>51</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Move</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="Checkerboard_ex">
-      <property name="geometry">
-       <rect>
-        <x>60</x>
-        <y>230</y>
-        <width>121</width>
-        <height>51</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Capture image</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="Get_pos_ex">
-      <property name="geometry">
-       <rect>
-        <x>220</x>
-        <y>120</y>
-        <width>121</width>
-        <height>51</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Get pos</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="Checker_laser_ex">
-      <property name="geometry">
-       <rect>
-        <x>220</x>
-        <y>230</y>
-        <width>121</width>
-        <height>51</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Capture checker</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="Save_pos_ex">
-      <property name="geometry">
-       <rect>
-        <x>380</x>
-        <y>120</y>
-        <width>121</width>
-        <height>51</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Save pos</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="Cap_laser_ex">
-      <property name="geometry">
-       <rect>
-        <x>380</x>
-        <y>230</y>
-        <width>121</width>
-        <height>51</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Capture laser</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="Continue">
-      <property name="geometry">
-       <rect>
-        <x>820</x>
-        <y>710</y>
-        <width>121</width>
-        <height>41</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Continue</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="Close">
-      <property name="geometry">
-       <rect>
-        <x>670</x>
-        <y>710</y>
-        <width>121</width>
-        <height>41</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Close</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label">
-      <property name="geometry">
-       <rect>
-        <x>60</x>
-        <y>20</y>
-        <width>481</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Times New Roman</family>
-        <pointsize>13</pointsize>
-        <weight>75</weight>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="text">
-       <string>EYE TO HAND CALIBRATION PROCESS</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_2">
-      <property name="geometry">
-       <rect>
-        <x>60</x>
-        <y>80</y>
-        <width>321</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Times New Roman</family>
-        <pointsize>10</pointsize>
-        <weight>75</weight>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="text">
-       <string>ROBOT TASK</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_3">
-      <property name="geometry">
-       <rect>
-        <x>60</x>
-        <y>190</y>
-        <width>321</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Times New Roman</family>
-        <pointsize>10</pointsize>
-        <weight>75</weight>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="text">
-       <string>CAMERA TASK</string>
-      </property>
-     </widget>
-     <widget class="QListWidget" name="infor_process_ex">
-      <property name="geometry">
-       <rect>
-        <x>30</x>
-        <y>370</y>
-        <width>931</width>
-        <height>311</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="Star_calib_process_ex">
-      <property name="geometry">
-       <rect>
-        <x>60</x>
-        <y>300</y>
-        <width>121</width>
-        <height>51</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Start</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="show_image_calib_ex">
-      <property name="geometry">
-       <rect>
-        <x>510</x>
-        <y>20</y>
-        <width>451</width>
-        <height>331</height>
-       </rect>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::WinPanel</enum>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-    </widget>
     <widget class="QWidget" name="Eye_in_hand">
      <attribute name="title">
       <string>Eye in hand</string>
@@ -344,7 +133,7 @@
        <string>Continue</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="Back_2">
+     <widget class="QPushButton" name="Close">
       <property name="geometry">
        <rect>
         <x>670</x>
@@ -354,7 +143,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>Back</string>
+       <string>Close</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_6">
@@ -464,24 +253,11 @@
      <attribute name="title">
       <string>Calib hand eye</string>
      </attribute>
-     <widget class="QPushButton" name="Calib_main_ex">
-      <property name="geometry">
-       <rect>
-        <x>40</x>
-        <y>20</y>
-        <width>111</width>
-        <height>41</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Calib eye to hand</string>
-      </property>
-     </widget>
      <widget class="QPushButton" name="Calib_main_in">
       <property name="geometry">
        <rect>
-        <x>40</x>
-        <y>360</y>
+        <x>30</x>
+        <y>30</y>
         <width>111</width>
         <height>41</height>
        </rect>
@@ -493,8 +269,8 @@
      <widget class="QPushButton" name="Back_3">
       <property name="geometry">
        <rect>
-        <x>670</x>
-        <y>710</y>
+        <x>650</x>
+        <y>720</y>
         <width>121</width>
         <height>41</height>
        </rect>
@@ -506,8 +282,8 @@
      <widget class="QPushButton" name="Continue_3">
       <property name="geometry">
        <rect>
-        <x>820</x>
-        <y>710</y>
+        <x>800</x>
+        <y>720</y>
         <width>121</width>
         <height>41</height>
        </rect>
@@ -516,86 +292,68 @@
        <string>Continue</string>
       </property>
      </widget>
-     <widget class="QListWidget" name="infor_eye_to_hand">
-      <property name="geometry">
-       <rect>
-        <x>40</x>
-        <y>80</y>
-        <width>501</width>
-        <height>261</height>
-       </rect>
-      </property>
-     </widget>
      <widget class="QListWidget" name="infor_eye_in_hand">
       <property name="geometry">
        <rect>
-        <x>40</x>
-        <y>420</y>
+        <x>30</x>
+        <y>90</y>
         <width>501</width>
         <height>261</height>
        </rect>
       </property>
      </widget>
-     <widget class="QWidget" name="verticalLayoutWidget_2">
+     <widget class="QWidget" name="widget_2" native="true">
       <property name="geometry">
        <rect>
-        <x>580</x>
-        <y>80</y>
-        <width>351</width>
+        <x>571</x>
+        <y>91</y>
+        <width>349</width>
+        <height>259</height>
+       </rect>
+      </property>
+      <property name="autoFillBackground">
+       <bool>true</bool>
+      </property>
+      <widget class="QWidget" name="verticalLayoutWidget_3">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>351</width>
+         <height>261</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="eyeinhand_graph"/>
+      </widget>
+     </widget>
+     <widget class="QListWidget" name="infor_laser_in_3">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>430</y>
+        <width>501</width>
         <height>261</height>
        </rect>
       </property>
-      <layout class="QVBoxLayout" name="eye2hand_graph">
-       <property name="leftMargin">
-        <number>0</number>
-       </property>
-       <property name="topMargin">
-        <number>0</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
-        <number>0</number>
-       </property>
-       <item>
-        <widget class="QWidget" name="widget" native="true">
-         <property name="autoFillBackground">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-      </layout>
      </widget>
-     <widget class="QWidget" name="verticalLayoutWidget_3">
+     <widget class="QPushButton" name="Calib_laser_in_3">
       <property name="geometry">
        <rect>
-        <x>580</x>
-        <y>420</y>
-        <width>351</width>
-        <height>261</height>
+        <x>30</x>
+        <y>370</y>
+        <width>191</width>
+        <height>41</height>
        </rect>
       </property>
-      <layout class="QVBoxLayout" name="eyeinhand_graph">
-       <item>
-        <widget class="QWidget" name="widget_2" native="true">
-         <property name="autoFillBackground">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-      </layout>
+      <property name="text">
+       <string>Calib laser - camera</string>
+      </property>
      </widget>
-    </widget>
-    <widget class="QWidget" name="Calib_laser">
-     <attribute name="title">
-      <string>Calib_laser </string>
-     </attribute>
      <widget class="QWidget" name="verticalLayoutWidget_5">
       <property name="geometry">
        <rect>
-        <x>580</x>
-        <y>420</y>
+        <x>581</x>
+        <y>431</y>
         <width>351</width>
         <height>261</height>
        </rect>
@@ -614,7 +372,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QWidget" name="widget_4" native="true">
+        <widget class="QWidget" name="widget_12" native="true">
          <property name="autoFillBackground">
           <bool>true</bool>
          </property>
@@ -622,209 +380,14 @@
        </item>
       </layout>
      </widget>
-     <widget class="QListWidget" name="infor_laser_in">
-      <property name="geometry">
-       <rect>
-        <x>40</x>
-        <y>420</y>
-        <width>501</width>
-        <height>261</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QListWidget" name="infor_laser_ex">
-      <property name="geometry">
-       <rect>
-        <x>40</x>
-        <y>80</y>
-        <width>501</width>
-        <height>261</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="Calib_laser_in">
-      <property name="geometry">
-       <rect>
-        <x>40</x>
-        <y>360</y>
-        <width>191</width>
-        <height>41</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Calib laser internal camera</string>
-      </property>
-     </widget>
-     <widget class="QWidget" name="verticalLayoutWidget_6">
-      <property name="geometry">
-       <rect>
-        <x>580</x>
-        <y>80</y>
-        <width>351</width>
-        <height>261</height>
-       </rect>
-      </property>
-      <layout class="QVBoxLayout" name="laser_ex_graph">
-       <item>
-        <widget class="QWidget" name="widget_3" native="true">
-         <property name="autoFillBackground">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QPushButton" name="Calib_laser_ex">
-      <property name="geometry">
-       <rect>
-        <x>40</x>
-        <y>20</y>
-        <width>201</width>
-        <height>41</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Calib laser external camera</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="Continue_4">
-      <property name="geometry">
-       <rect>
-        <x>820</x>
-        <y>710</y>
-        <width>121</width>
-        <height>41</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Continue</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="Back_4">
-      <property name="geometry">
-       <rect>
-        <x>670</x>
-        <y>710</y>
-        <width>121</width>
-        <height>41</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Back</string>
-      </property>
-     </widget>
-    </widget>
-    <widget class="QWidget" name="Get_scan_trectory">
-     <attribute name="title">
-      <string>Scan trajectory</string>
-     </attribute>
-     <widget class="QPushButton" name="run_find_scan_trajectory">
-      <property name="geometry">
-       <rect>
-        <x>50</x>
-        <y>90</y>
-        <width>131</width>
-        <height>41</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Capture workpiece</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="Continue_7">
-      <property name="geometry">
-       <rect>
-        <x>820</x>
-        <y>710</y>
-        <width>121</width>
-        <height>41</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Continue</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="Back_7">
-      <property name="geometry">
-       <rect>
-        <x>670</x>
-        <y>710</y>
-        <width>121</width>
-        <height>41</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Back</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_7">
-      <property name="geometry">
-       <rect>
-        <x>50</x>
-        <y>40</y>
-        <width>481</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Times New Roman</family>
-        <pointsize>13</pointsize>
-        <weight>75</weight>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="text">
-       <string>FIND SCAN TRAJECTORY</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_8">
-      <property name="geometry">
-       <rect>
-        <x>30</x>
-        <y>420</y>
-        <width>481</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Times New Roman</family>
-        <pointsize>13</pointsize>
-        <weight>75</weight>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="text">
-       <string>SCAN TRAJECTORY</string>
-      </property>
-     </widget>
-     <widget class="QListWidget" name="output_scan_trajectory">
-      <property name="geometry">
-       <rect>
-        <x>30</x>
-        <y>470</y>
-        <width>931</width>
-        <height>211</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QLabel" name="show_image_ex">
-      <property name="geometry">
-       <rect>
-        <x>440</x>
-        <y>50</y>
-        <width>451</width>
-        <height>331</height>
-       </rect>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::WinPanel</enum>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
+     <zorder>widget_2</zorder>
+     <zorder>Calib_main_in</zorder>
+     <zorder>Back_3</zorder>
+     <zorder>Continue_3</zorder>
+     <zorder>infor_eye_in_hand</zorder>
+     <zorder>infor_laser_in_3</zorder>
+     <zorder>Calib_laser_in_3</zorder>
+     <zorder>verticalLayoutWidget_5</zorder>
     </widget>
     <widget class="QWidget" name="main_scan">
      <attribute name="title">

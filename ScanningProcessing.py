@@ -8,7 +8,7 @@ from GlobalVariables import *
 from matplotlib import pyplot as plt
 import tqdm
 from PyQt5.QtCore import QObject, pyqtSignal
-
+import time
 rows = 1200
 cols = 1700
 
@@ -40,9 +40,10 @@ def WeldSeamCenter(img):
     # adjust w to find the center of weldseam
     w = 2
     weldseam_center = []
-    for j in range(720, 820, 1):
+    # for j in range(625, 750, 1):
+    for j in range(700, 800, 1):
         d = []
-        for i in range(500, 800, 1):
+        for i in range(400, 700, 1):
             # if img[i][j] < 50:
             a = 2*(img[i-1,j]+img[i,j]+img[i+1,j])
             b = img[i+w,j]+img[i+w+1,j]+img[i+w+2,j]
@@ -53,7 +54,7 @@ def WeldSeamCenter(img):
             del b
             del c
         min_val = min(d)
-        center_point = [j, d.index(min_val)+500]
+        center_point = [j, d.index(min_val)+400]
         # center_point = [j, d.index(min_val)]
         weldseam_center.append(center_point)
         del d
@@ -104,16 +105,42 @@ def calc_weldpoint2robot(point, pos):
     tool2robot         = vis.homogeneous(pos)
     weldpoint2robot    = tool2robot.dot(eye2hand).dot(weldpoint2camera).flatten()[0:3]
     return weldpoint2robot
-def get_laser_line(img):
+def create_roi(image, x, y, width, height):
+    # Tạo một mặt nạ trống có cùng kích thước với ảnh đầu vào
+    mask = np.zeros_like(image)
 
+    # Vẽ hình chữ nhật trên mặt nạ
+    cv.rectangle(mask, (x, y), (x + width, y + height), (255, 255, 255), -1)
+
+    # Áp dụng mặt nạ lên ảnh
+    roi = cv.bitwise_and(image, mask)
+    return roi
+def get_laser_line(img):
     blur = cv.GaussianBlur(img, (7, 7), 0)  # use when img is gray image
-    _, thresh = cv.threshold(blur, 100, 255, cv.THRESH_BINARY)
+    _, thresh = cv.threshold(blur, 120, 255, cv.THRESH_BINARY)
+    # thresh = create_roi(thresh,500,735,100,200)
+    thresh = create_roi(thresh, 730, 350, 100, 300)
+    # cv.namedWindow('img', cv.WINDOW_NORMAL)
+    # cv.resizeWindow('img', 640,640)
+    # cv.imshow("img",thresh)
+    # cv.waitKey(0)
+    t1 = time.time()
     thinned_contours = cv.ximgproc.thinning(thresh)
+    # cv.namedWindow('img', cv.WINDOW_NORMAL)
+    # cv.resizeWindow('img', 640,640)
+    # cv.imshow("img",thinned_contours)
+    # cv.waitKey(0)
+
     line = LaserCenter(thinned_contours)
+    t2 = time.time() - t1
+    print(t2)
+    # line = LaserCenter(thresh)
     rows, cols = thresh.shape
     points = []
-    for i in range(500, 700, 1):
-        for j in range(700, 900, 1):
+    # for i in range(550, 750, 1):
+    #     for j in range(650, 725, 1):
+    for i in range(350, 650, 1):
+        for j in range(730, 830, 1):
             if line[i][j] == 255:
                 # cv.circle(img, (j, i), 5, [255, 0, 0], 6)
                 points.append((j, i))
@@ -127,41 +154,44 @@ def get_laser_line(img):
     point1 = (line_x[0], line_y_robust[0])
     point2 = (line_x[1], line_y_robust[1])
     # print(point1, point2)
-    cv.circle(img, (point1[0],int(point1[1])), 5, [255, 0, 0], 10)
-    cv.circle(img, (point2[0],int(point2[1])), 5, [255, 0, 0], 10)
-    # cv.namedWindow('img', cv.WINDOW_NORMAL)
-    # cv.resizeWindow('img', 640,640)
-    # cv.imshow("img",img)
-    # cv.waitKey(0)
+    # cv.circle(img, (point1[0],int(point1[1])), 5, [255, 0, 0], 10)
+    # cv.circle(img, (point2[0],int(point2[1])), 5, [255, 0, 0], 10)
     return point1,point2
 class generate_trajectory(QObject):
     trajectory_signal = pyqtSignal(str)
     def __init__(self):
         QObject.__init__(self)
     def main_scanning(self):
+        t0 = time.time()
         WeldPoints = []
-        pos_no = 0
-
-        Images = glob.glob(r'E:/Thesis/App_Data/Scan_data4/weldseam' + '*.jpg')
-
+        pos_no = 1
+        Images = glob.glob(scan_weld_seam_img_path+'/weldseam' + '*.jpg')
         Images.sort(key=natural_keys)
         # laser center line
         # laser_center_1 = [785, 720]
         # laser_center_2 = [785, 480]
-
+        path = "E:\Thesis\App_Data\Scan_data3\weldseam_6.jpg"
+        image_laser = cv.imread(path, cv.IMREAD_GRAYSCALE)
+        # img = cv.imread(image, cv.IMREAD_GRAYSCALE)
+        # laser line
+        laser_center_1, laser_center_2 = get_laser_line(image_laser)
+        laser_centerline = (laser_center_1, laser_center_2)
         print(Images)
         with open(scan_pos_path, 'r') as f:
             positions = [[float(num) for num in line.split('\t')] for line in f]
         for image in Images:
             img = cv.imread(image, cv.IMREAD_GRAYSCALE)
-            #laser line
-            laser_center_1, laser_center_2 = get_laser_line(img)
-            laser_centerline = (laser_center_1, laser_center_2)
+            # #laser line
+            # laser_center_1, laser_center_2 = get_laser_line(img)
+            # laser_centerline = (laser_center_1, laser_center_2)
             # print(laser_centerline)
+            t3 = time.time()
             weldseam_center = WeldSeamCenter(img=img)
             for point in weldseam_center:
                 center = tuple(point)
                 # cv.circle(img, center, 5, [255, 0, 0], 2)
+            t4 = time.time()-t3
+            print(t4)
             # print(weldseam_center)
             # cv.namedWindow('img', cv.WINDOW_NORMAL)
             # cv.resizeWindow('img', 640,640)
@@ -178,7 +208,7 @@ class generate_trajectory(QObject):
             # weldseam line
             weldseam_point_1 = [line_x[0], line_y_robust[0]]
             weldseam_point_2 = [line_x[1], line_y_robust[1]]
-            weldseam = (weldseam_point_1, weldseam_point_2)\
+            weldseam = (weldseam_point_1, weldseam_point_2)
 
             # find intersection
             feature_point = line_intersection(weldseam, laser_centerline)
@@ -193,14 +223,22 @@ class generate_trajectory(QObject):
             pos_no += 1
             WeldPoints.append(weldpoint2robot)
             # show img
-            for p in weldseam_center:
-                cv.circle(img, (int(p[0]),int(p[1])), 1, (255, 255, 255), 1)
-            img[:,720] = 255
-            img[:,820] = 255
+            # for p in weldseam_center:
+            #     cv.circle(img, (int(p[0]),int(p[1])), 1, (255, 255, 255), 1)
+            # img[:,625] = 255
+            # img[:,700] = 255
+            # img[550,:] = 255
+            # img[650,:] = 255
             frame = cv.cvtColor(img, cv.COLOR_GRAY2RGB)
             cv.circle(frame, (int(feature_point[0]),int(feature_point[1])), 5, (255, 0, 0), 5)
-            cv.circle(frame,(int(laser_center_1[0]), int(laser_center_1[1])), 5, (0, 255, 0), 5)
-            cv.circle(frame, (int(laser_center_2[0]), int(laser_center_2[1])), 5, (0, 255, 0), 5)
+            # cv.circle(frame,(int(laser_center_1[0]), int(laser_center_1[1])), 5, (0, 255, 0), 5)
+            # cv.circle(frame, (int(laser_center_2[0]), int(laser_center_2[1])), 5, (0, 255, 0), 5)
+            # cv.namedWindow('img', cv.WINDOW_NORMAL)
+            # cv.resizeWindow('img', 640, 640)
+            # plt.imshow(frame)
+            # plt.show()
+            # # cv.imshow("img",frame)
+            # cv.waitKey(0)
             frame = cv.resize(frame, (870,687), interpolation = cv.INTER_AREA)
             img_name = 'E:/Thesis/App_Data/Scanning_img_after_processed/' + str(pos_no) + '.jpg'
             cv.imwrite(img_name, frame)
@@ -214,6 +252,8 @@ class generate_trajectory(QObject):
         X = WeldPoints[:,0]
         Y = WeldPoints[:,1]
         Z = WeldPoints[:,2]
+        t10 = time.time() - t0
+        print(t10)
         return X,Y,Z
 if __name__ == "__main__":
     run_scan = generate_trajectory()
@@ -224,6 +264,9 @@ if __name__ == "__main__":
     ax.set_xlabel('x')
     ax.set_ylabel('y')
     ax.set_zlabel('z')
+    # ax.set_xlim3d(600, 800)
+    # ax.set_ylim3d(0, 100)
+    # ax.set_zlim3d(200, 250)
     del X, Y, Z
 
     plt.show()

@@ -23,6 +23,20 @@ class Vision():
         self.rows_ex = 2560
         self.cols_ex = 2560
 
+    def Preprocessing_laser(self,img):
+        newcameramtx, _ =cv.getOptimalNewCameraMatrix(self.intrinsic,self.dist_coffs,(self.rows,self.cols),1,(self.rows,self.cols))
+        img = cv.undistort(img, self.intrinsic, self.dist_coffs, None, newcameramtx)
+        # grayimg = cv.cvtColor(img, cv.COLOR_BGR2GRAY)     # use when img is color image
+        # blur = cv.GaussianBlur(grayimg,(7,7),0)
+        blur = cv.GaussianBlur(img,(7,7),0)                 # use when img is gray image
+        # _, thresh = cv.threshold(blur,80,255,cv.THRESH_BINARY)
+        _, thresh = cv.threshold(blur, 120, 255, cv.THRESH_BINARY)
+        closing = thresh
+        del blur
+        for _ in range(7):
+            closing = cv.morphologyEx(closing, cv.MORPH_CLOSE, np.ones((7,7),np.uint8))
+        del thresh
+        return closing
     def Preprocessing(self,img):
         newcameramtx, _ =cv.getOptimalNewCameraMatrix(self.intrinsic,self.dist_coffs,(self.rows,self.cols),1,(self.rows,self.cols))
         img = cv.undistort(img, self.intrinsic, self.dist_coffs, None, newcameramtx)
@@ -30,7 +44,7 @@ class Vision():
         # blur = cv.GaussianBlur(grayimg,(7,7),0)
         blur = cv.GaussianBlur(img,(7,7),0)                 # use when img is gray image
         # _, thresh = cv.threshold(blur,80,255,cv.THRESH_BINARY)
-        _, thresh = cv.threshold(blur, 60, 255, cv.THRESH_BINARY)
+        _, thresh = cv.threshold(blur, 80, 255, cv.THRESH_BINARY)
         closing = thresh
         del blur
         for _ in range(7):

@@ -1,0 +1,33 @@
+<RCC>
+  <qresource prefix="Icons">
+    <file>icons8-configuration-65.png</file>
+    <file>icons8-transfer-96.png</file>
+    <file>icons8-3d-64.png</file>
+    <file>icons8-monitor-80.png</file>
+    <file>icons8-search-80.png</file>
+    <file>icons8-config-80.png</file>
+    <file>icons8-config-96.png</file>
+    <file>icons8-start-80.png</file>
+    <file>icons8-capture-80.png</file>
+    <file>icons8-location-40.png</file>
+    <file>icons8-location-80.png</file>
+    <file>power.png</file>
+    <file>play.png</file>
+    <file>save.png</file>
+    <file>floppy-disk.png</file>
+    <file>move-right (1).png</file>
+    <file>move-right.png</file>
+    <file>moving.png</file>
+    <file>preparation.png</file>
+    <file>initiative.png</file>
+    <file>welding.png</file>
+    <file>icons8-welding-64.png</file>
+  </qresource>
+  <qresource prefix="Logos">
+    <file>syntec.png</file>
+    <file>17570395_LOGO.jpg</file>
+    <file>01_logobachkhoasang.png</file>
+    <file>think_alpha.jpg</file>
+    <file>stop1.jpg</file>	
+  </qresource>
+</RCC>
